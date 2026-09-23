@@ -16,7 +16,7 @@
 
 ## 怎么用
 
-1. 打开页面：https://jck19924362.github.io/shiyuan-teacher-match/
+1. 打开页面：https://jck19924362.github.io/zj-shiyuan-teacher-match/
 2. 按实际情况填档案 → 点「匹配」看结果
 3. 用顶部「报考学段聚焦」缩小范围，灰卡原因一目了然
 
