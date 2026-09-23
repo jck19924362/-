@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>浙江教师招聘智能匹配</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #2B5CE6;
+      --blue-deep: #1B3AA0;
+      --blue-bright: #4A7DFF;
+      --blue-soft: #EBF1FF;
+      --bg: #F4F6FB;
+      --ink: #1A2233;
+      --ink-sub: #5B6478;
+      --line: #E3E8F2;
+      --ok: #17A66B;
+      --maybe: #F08A24;
+      --no: #E5484D;
+      --violet: #6D4AFF;
+    }
+    body {
+      font-family: -apple-system, "PingFang SC", "微软雅黑", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .header {
+      background: linear-gradient(135deg, #141F4D 0%, #1B3AA0 40%, #2B5CE6 75%, #4A7DFF 100%);
+      color: #fff;
+      padding: 40px 16px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: ""; position: absolute; top: -80px; right: -50px;
+      width: 280px; height: 280px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.14) 0%, transparent 70%);
+      z-index: 0;
+    }
+    .header::after {
+      content: ""; position: absolute; bottom: -60px; left: -60px;
+      width: 240px; height: 240px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%);
+      z-index: 0;
+    }
+    .header .deco-dot {
+      position: absolute; width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+    }
+    .header .hero-badge {
+      display: inline-block; position: relative;
+      padding: 5px 16px; margin-bottom: 13px;
+      font-size: 13.5px; font-weight: 700; letter-spacing: 2px;
+      color: #fff; background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.38);
+      border-radius: 999px; text-shadow: 0 1px 6px rgba(0,0,0,0.15);
+    }
+    .header h1 {
+      font-size: 30px; margin-bottom: 10px; letter-spacing: 1px; position: relative; font-weight: 800;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    }
+    .header .slogan { font-size: 15px; opacity: 0.92; margin-bottom: 24px; position: relative; font-weight: 400; letter-spacing: 0.5px; }
+    .header .hero-stats {
+      display: flex; justify-content: center; gap: 28px; position: relative; margin-bottom: 26px;
+    }
+    .header .hero-stat { text-align: center; }
+    .header .hero-stat .num { font-size: 24px; font-weight: 800; line-height: 1.1; }
+    .header .hero-stat .lab { font-size: 12px; opacity: 0.82; margin-top: 2px; }
+
+    /* 学段导航 */
+    .stage-nav {
+      display: flex;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(8px);
+      border-radius: 16px 16px 0 0;
+      margin: 0 16px;
+      padding: 6px 6px 0;
+      position: relative;
+      z-index: 2;
+    }
+    .stage-tab {
+      flex: 1;
+      padding: 12px 4px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.78);
+      border-radius: 12px 12px 0 0;
+      transition: all 0.22s;
+      position: relative;
+    }
+    .stage-tab .icon { font-size: 21px; display: block; margin-bottom: 2px; transition: transform 0.22s; }
+    .stage-tab:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .stage-tab:hover .icon { transform: translateY(-2px); }
+    .stage-tab.active {
+      color: var(--blue-deep);
+      background: #fff;
+      font-weight: bold;
+      box-shadow: 0 -4px 14px rgba(0,0,0,0.10);
+    }
+    .stage-tab.active .icon { transform: translateY(-2px); }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 0 16px 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 0 0 18px 18px;
+      padding: 26px 22px;
+      box-shadow: 0 1px 2px rgba(26,34,51,0.04), 0 16px 40px rgba(27,58,160,0.10);
+      margin-bottom: 16px;
+    }
+    .card.round { border-radius: 18px; }
+    .section-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 18px;
+      padding-left: 13px;
+      position: relative;
+      letter-spacing: 0.5px;
+    }
+    .section-title::before {
+      content: ""; position: absolute; left: 0; top: 2px; bottom: 2px;
+      width: 5px; border-radius: 5px;
+      background: linear-gradient(180deg, var(--blue-bright), var(--violet));
+    }
+    .form-group { margin-bottom: 22px; }
+    .form-group > label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 9px;
+      color: #2C3E50;
+    }
+    /* —— 档案分组 —— */
+    .form-section { margin-bottom: 24px; }
+    .form-section-head {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 14.5px; font-weight: 800; color: var(--blue-deep);
+      margin-bottom: 18px; padding: 8px 13px;
+      background: linear-gradient(90deg, #EEF4FF 0%, #F8FAFF 100%);
+      border-left: 4px solid var(--blue-bright);
+      border-radius: 9px; letter-spacing: 0.6px;
+    }
+    .form-section-head .num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 21px; height: 21px; border-radius: 50%;
+      background: var(--blue-bright); color: #fff;
+      font-size: 12px; font-weight: 800; flex: none;
+    }
+    .form-section .form-group:last-child { margin-bottom: 0; }
+    .hint details { margin-top: 6px; }
+    .hint summary { cursor: pointer; color: var(--blue); font-weight: bold; font-size: 12.5px; list-style: none; }
+    .hint summary::-webkit-details-marker { display: none; }
+    .hint summary::before { content: "\25B8 "; }
+    .hint details[open] summary::before { content: "\25BE "; }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .options label {
+      font-weight: normal;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      background: #F7F9FC;
+      border-radius: 999px;
+      border: 1.5px solid var(--line);
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--ink-sub);
+      transition: all 0.18s;
+      position: relative;
+      user-select: none;
+    }
+    .options label input {
+      position: absolute; opacity: 0; width: 0; height: 0; margin: 0;
+    }
+    .options label:hover {
+      border-color: var(--blue-bright);
+      color: var(--blue);
+      background: #F1F5FF;
+    }
+    .options label.active {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-bright) 100%);
+      border-color: var(--blue);
+      color: #fff;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(43,92,230,0.30);
+    }
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+      margin-bottom: 10px;
+      color: var(--ink);
+      transition: border-color 0.18s, box-shadow 0.18s;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E6D7E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 14px;
+    }
+    select:focus, textarea:focus, .custom-honor-row input:focus, #majorCustom:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(24,95,165,0.14);
+    }
+    textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    #majorCustom {
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .cert-group-title {
+      font-size: 12px;
+      color: var(--blue);
+      font-weight: bold;
+      margin: 12px 0 7px;
+      padding: 3px 10px;
+      background: var(--blue-soft);
+      border-radius: 6px;
+      display: inline-block;
+      letter-spacing: 0.5px;
+    }
+    .btn-save {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--blue-deep) 0%, var(--blue) 50%, var(--violet) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 16.5px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 3px;
+      box-shadow: 0 6px 20px rgba(43,92,230,0.38);
+      transition: all 0.22s;
+      margin-top: 6px;
+    }
+    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(43,92,230,0.46); }
+    .btn-save:active { transform: translateY(0); opacity: 0.94; }
+    .msg {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--ok);
+      font-weight: bold;
+      min-height: 20px;
+    }
+    .hint { font-size: 12px; color: #8A97A5; margin-top: 6px; line-height: 1.5; }
+
+    /* 自定义荣誉 */
+    .custom-honor-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .custom-honor-row input {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      font-size: 14px;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .custom-honor-row button {
+      padding: 9px 16px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-bright));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity 0.18s;
+      white-space: nowrap;
+    }
+    .custom-honor-row button:hover { opacity: 0.88; }
+    .honor-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      background: var(--blue-soft);
+      border: 1.5px solid var(--blue);
+      border-radius: 999px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .honor-tag:hover { background: #D9E9F8; }
+    .honor-tag .del { color: var(--no); font-weight: bold; }
+
+    /* 筛选开关 */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border-radius: 14px;
+      padding: 13px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(31,45,61,0.05), 0 6px 18px rgba(24,95,165,0.06);
+      font-size: 14px;
+      color: #2C3E50;
+    }
+    .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: #CBD5E0; border-radius: 26px; cursor: pointer; transition: 0.25s;
+    }
+    .slider:before {
+      content: ""; position: absolute; height: 20px; width: 20px;
+      left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .switch input:checked + .slider { background: linear-gradient(135deg, var(--blue), var(--blue-bright)); }
+    .switch input:checked + .slider:before { transform: translateX(20px); }
+
+    #resultArea { margin-top: 8px; }
+    .job-card {
+      border-radius: 14px;
+      padding: 15px 15px 15px 17px;
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--line);
+      cursor: pointer;
+      background: #fff;
+      transition: all 0.18s;
+      position: relative;
+      box-shadow: 0 1px 2px rgba(26,34,51,0.03);
+    }
+    .job-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(27,58,160,0.14);
+    }
+    .job-card:active { transform: scale(0.99); }
+    .job-card.ok { background: #F3FAF5; border-left-color: var(--ok); }
+    .job-card.maybe { background: #FFFAF1; border-left-color: var(--maybe); }
+    .job-card.no { background: #FDF4F4; border-left-color: var(--no); }
+    .job-title { font-weight: bold; font-size: 15px; color: var(--blue-deep); overflow: hidden; padding-right: 62px; line-height: 1.45; }
+    .job-status {
+      float: right; font-size: 12px; font-weight: bold;
+      padding: 2px 10px; border-radius: 999px; margin-top: 1px;
+    }
+    .job-card.ok .job-status { background: var(--ok); color: #fff; }
+    .job-card.maybe .job-status { background: var(--maybe); color: #fff; }
+    .job-card.no .job-status { background: #C9CFD6; color: #fff; }
+    .job-info { font-size: 14px; margin-top: 7px; font-weight: bold; color: var(--ink); }
+    .job-sub { font-size: 12px; color: var(--ink-sub); margin-top: 4px; }
+    .job-exam { font-size: 12px; color: #5A3FB8; margin-top: 5px; line-height: 1.5; background: #F6F2FF; border-radius: 6px; padding: 5px 9px; }
+    .job-tip { color: var(--maybe); font-size: 12px; margin-top: 6px; }
+    .job-reason { color: var(--no); font-size: 12px; margin-top: 6px; }
+    .tag-stage { background: #EAF2FB; color: #1F5C99; border: 1px solid #BBD6F2; font-size: 11px; padding: 1px 7px; border-radius: 999px; margin-left: 5px; font-weight: 600; display: inline-block; }
+    .tag-subject { background: #FFF3E0; color: #B26A00; border: 1px solid #F5D9A8; font-size: 11px; padding: 1px 7px; border-radius: 999px; margin-left: 5px; font-weight: 600; display: inline-block; }
+    .job-posts { font-size: 12px; color: #4A5568; margin-top: 6px; background: #F7F9FC; border: 1px solid #E8EEF6; border-radius: 6px; padding: 5px 9px; line-height: 1.5; }
+    .job-facts { margin-top: 10px; background: rgba(255,255,255,0.72); border-radius: 10px; padding: 7px 11px; display: flex; flex-direction: column; gap: 2px; }
+    .job-card.ok .job-facts { background: rgba(255,255,255,0.85); }
+    .job-fact { font-size: 12px; color: #4A5568; line-height: 1.55; display: flex; align-items: baseline; }
+    .job-fact .k { flex-shrink: 0; width: 58px; color: #1F5C99; font-weight: 600; }
+    .job-fact .v { flex: 1; min-width: 0; }
+    .job-fact.exam .k { color: #5A3FB8; }
+    .job-cohort { background: #EAF2FB; border: 1px solid #BBD6F2; border-radius: 8px; padding: 6px 10px; color: #1F5C99; font-size: 12px; margin: 6px 0; line-height: 1.5; }
+    /* 报考学段聚焦 胶囊分段按钮（ID 级选择器，防外部主题覆盖） */
+    #focusSeg { display: inline-flex; background: #EEF2F9; border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
+    #focusSeg button { border: none; background: transparent; color: var(--ink-sub); font-size: 13px; padding: 6px 16px; border-radius: 999px; cursor: pointer; transition: background .18s ease, color .18s ease, box-shadow .18s ease; font-weight: 600; line-height: 1.4; forced-color-adjust: none; -ms-high-contrast-adjust: none; }
+    #focusSeg button:hover { color: var(--blue); background: rgba(43,92,230,0.08); }
+    #focusSeg button.active { background: linear-gradient(135deg, var(--blue), var(--blue-bright)); color: #fff; box-shadow: 0 2px 8px rgba(43,92,230,0.35); forced-color-adjust: none; }
+    .focusseg-label { font-size: 13px; color: var(--ink-sub); margin-right: 2px; align-self: center; font-weight: 600; }
+    /* 聚焦状态提示条：解释灰色卡片原因 */
+    #focusHint { font-size: 12px; color: var(--ink-sub); margin: 6px 0 12px; padding: 8px 12px; background: #F6F8FB; border: 1px solid var(--line); border-radius: 10px; line-height: 1.7; display: none; }
+    /* 学科对口提示条（与聚焦提示同款样式）；内容为空时自动隐藏，避免页面初始出现空灰框 */
+    #stageHint:empty { display: none; }
+    /* 聚焦后教资不足的灰显卡片 */
+    .job-card.focusgrey { opacity: .75; filter: grayscale(0.5); background: #F6F8FB; border-style: dashed; }
+    .job-card.focusgrey .job-status { background: #94A3B8 !important; }
+    .badge-needcert { background:#EDEFF4; color:#475569; border:1px solid #CBD5E1; font-size:11px; padding:1px 7px; border-radius:999px; margin-left:5px; font-weight:600; }
+    /* 结果列表内的「当前聚焦」小胶囊（列表长时往下翻也能看到状态，✕ 一键取消） */
+    .focus-chip { display: inline-flex; align-items: center; gap: 7px; margin: 10px 0 2px; padding: 5px 7px 5px 12px; background: var(--blue-soft); border: 1px solid #C7D8F7; border-radius: 999px; font-size: 12.5px; color: var(--blue-deep); font-weight: 600; }
+    .focus-chip .x { cursor: pointer; width: 18px; height: 18px; line-height: 17px; text-align: center; border-radius: 50%; background: rgba(43,92,230,.12); font-weight: 700; font-size: 11px; }
+    .focus-chip .x:hover { background: var(--blue); color: #fff; }
+    .job-card.cohort { background: #F5F9FE; border-left-color: #2E7FD4; }
+    .job-card.cohort .job-status { background: #2E7FD4; color: #fff; }
+    .sub-group-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--ink); margin: 16px 0 8px; padding-bottom: 6px; border-bottom: 1px dashed var(--line); }
+    .sub-group-title .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .sub-group-title .dot.cohort { background: #2E7FD4; }
+    .sub-group-title .dot.real { background: var(--no); }
+    .job-note { color: #8A97A5; font-size: 12px; margin-top: 6px; }
+    .job-hit {
+      color: var(--ok); font-size: 12px; margin-top: 6px;
+      background: rgba(46,158,91,0.08); border: 1px solid rgba(46,158,91,0.25);
+      border-radius: 8px; padding: 4px 8px; font-weight: 600;
+    }
+    .job-source { font-size: 12px; color: #8A97A5; margin-top: 8px; }
+    .badge-early {
+      background: linear-gradient(135deg, #D64545, #E85D5D); color: #fff; font-size: 11px;
+      padding: 2px 8px; border-radius: 999px; margin-left: 6px; font-weight: normal;
+      vertical-align: 1px;
+    }
+    .badge-year {
+      background: linear-gradient(135deg, #185FA5, #2E86D8); color: #fff; font-size: 11px;
+      padding: 2px 8px; border-radius: 999px; margin-left: 6px; font-weight: normal;
+      vertical-align: 1px;
+    }
+    .badge-bianzhi {
+      background: linear-gradient(135deg, #2E9E5B, #3DB86D); color: #fff; font-size: 11px;
+      padding: 2px 8px; border-radius: 999px; margin-left: 6px; font-weight: normal;
+      vertical-align: 1px;
+    }
+    .badge-nosubj {
+      background: #F1F3F5; color: #6B7280; border: 1px solid #D0D7DE; font-size: 11px;
+      padding: 1px 8px; border-radius: 999px; margin-left: 6px; font-weight: normal;
+      vertical-align: 1px;
+    }
+    .fresh-bar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      background: #F7F9FC; border: 1px solid var(--line);
+      border-radius: 10px; padding: 9px 12px; margin: 8px 0 12px;
+      font-size: 12.5px; color: var(--ink-sub); line-height: 1.6;
+    }
+    .fresh-bar .f-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #fff; border: 1px solid var(--line);
+      border-radius: 999px; padding: 2px 10px; font-size: 12px; color: var(--ink);
+    }
+    .fresh-bar .f-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .f-dot.live { background: #17A66B; }
+    .f-dot.soon { background: #E5484D; }
+    .f-dot.ended { background: #C9CFD6; }
+    .f-dot.unknown { background: #B9C2CE; }
+    .site-foot {
+      text-align: center; font-size: 12px; color: #8A97A5;
+      padding: 18px 16px 28px; line-height: 1.8;
+      border-top: 0.5px solid var(--line); margin-top: 24px;
+    }
+    .site-foot a { color: #8A97A5; }
+    .site-foot-stat {
+      margin-top: 10px; font-size: 12px; color: #B9C2CE;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 12px; border-radius: 999px;
+      background: rgba(155,155,155,0.06);
+    }
+    .summary { font-size: 14px; color: var(--ink-sub); margin-bottom: 14px; }
+    .summary b { font-size: 16px; }
+    .summary-bar {
+      display: flex; gap: 10px; margin: 10px 0 14px;
+    }
+    .summary-item {
+      flex: 1; text-align: center; padding: 12px 6px 8px; border-radius: 14px;
+      background: #fff; border: 1px solid var(--line); position: relative; overflow: hidden;
+      cursor: pointer; transition: all 0.18s; box-shadow: 0 2px 6px rgba(31,45,61,0.04);
+    }
+    .summary-item.active { box-shadow: 0 0 0 2px currentColor; }
+    .summary-item:active { transform: scale(0.97); }
+    .summary-item::after {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .summary-item .n { font-size: 26px; font-weight: 800; line-height: 1.1; }
+    .summary-item .t { font-size: 12px; color: var(--ink-sub); margin-top: 2px; }
+    .summary-item.ok { background: linear-gradient(135deg, #EDFBF3, #F4FDF8); border-color: #C9EBD8; }
+    .summary-item.ok::after { background: var(--ok); }
+    .summary-item.ok .n { color: var(--ok); }
+    .summary-item.maybe { background: linear-gradient(135deg, #FFF6EA, #FFFAF1); border-color: #F5DFBE; }
+    .summary-item.maybe::after { background: var(--maybe); }
+    .summary-item.maybe .n { color: var(--maybe); }
+    .summary-item.no { background: linear-gradient(135deg, #FDF0F0, #FEF7F7); border-color: #F3D2D2; }
+    .summary-item.no::after { background: var(--no); }
+    .summary-item.no .n { color: var(--no); }
+    .summary-item .jump-hint {
+      font-size: 10px; color: #A0AAB8; margin-top: 2px; opacity: 0; transition: opacity 0.18s;
+    }
+    .summary-item:hover .jump-hint { opacity: 1; }
+    .empty-tip { text-align: center; color: #9AA7B4; font-size: 14px; padding: 36px 0; }
+
+    /* 不符分类下的两个子方块 */
+    .sub-bar { display: flex; gap: 10px; margin: 4px 0 12px; }
+    .sub-item {
+      flex: 1; text-align: center; padding: 10px 6px 8px; border-radius: 12px;
+      background: #fff; border: 1px solid var(--line); cursor: pointer; transition: all 0.18s;
+      box-shadow: 0 2px 6px rgba(31,45,61,0.04); position: relative; overflow: hidden;
+    }
+    .sub-item:active { transform: scale(0.97); }
+    .sub-item::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .sub-item .n { font-size: 22px; font-weight: 800; line-height: 1.1; }
+    .sub-item .t { font-size: 12.5px; font-weight: 700; margin-top: 2px; }
+    .sub-item .hint { font-size: 10px; color: #A0AAB8; margin-top: 2px; }
+    .sub-item.cohort { background: linear-gradient(135deg, #EAF3FD, #F2F8FE); border-color: #BBD7F2; }
+    .sub-item.cohort::after { background: var(--blue); }
+    .sub-item.cohort .n { color: var(--blue); }
+    .sub-item.cohort .t { color: var(--blue-deep); }
+    .sub-item.real { background: linear-gradient(135deg, #FDF0F0, #FEF7F7); border-color: #F3D2D2; }
+    .sub-item.real::after { background: var(--no); }
+    .sub-item.real .n { color: var(--no); }
+    .sub-item.real .t { color: #B2453E; }
+    .sub-item.active { box-shadow: 0 0 0 2px currentColor; }
+    .sub-item.cohort.active { color: var(--blue); }
+    .sub-item.real.active { color: #B2453E; }
+
+
+    /* 收藏 */
+    .fav-btn {
+      position: absolute; right: 10px; bottom: 10px; width: 34px; height: 34px;
+      border-radius: 50%; border: 1px solid var(--line); background: #fff;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      font-size: 18px; line-height: 1; transition: all 0.18s; z-index: 2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .fav-btn:hover { transform: scale(1.08); border-color: #F4C542; }
+    .fav-btn.active { background: #FFF9E6; border-color: #F4C542; }
+    .fav-btn .star { color: #C9CFD6; transition: color 0.18s; }
+    .fav-btn.active .star { color: #F4C542; }
+
+    /* 浮动时间线入口 */
+    .fab-timeline {
+      position: fixed; right: 14px; bottom: 22px; z-index: 90;
+      background: linear-gradient(135deg, var(--blue-deep), var(--blue));
+      color: #fff; border: none; border-radius: 50px; padding: 12px 18px;
+      font-size: 14px; font-weight: bold; cursor: pointer;
+      box-shadow: 0 6px 20px rgba(27,58,160,0.34);
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.22s;
+    }
+    .fab-timeline:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(27,58,160,0.42); }
+    .fab-timeline .badge {
+      background: #fff; color: var(--blue-deep); font-size: 11px; font-weight: bold;
+      min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* 时间线弹窗 */
+    .timeline-modal { max-height: 92vh; }
+    .timeline-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #EDF1F6;
+    }
+    .timeline-title { font-size: 17px; font-weight: bold; color: var(--blue-deep); }
+    .timeline-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .timeline-actions button {
+      font-size: 12px; border: 1px solid var(--line); background: #fff; border-radius: 8px;
+      padding: 6px 10px; cursor: pointer; color: var(--ink-sub); transition: all 0.18s;
+    }
+    .timeline-actions button:hover { background: #F2F5F9; border-color: #C8D2E0; }
+    .timeline-chart-wrap {
+      background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+      margin-bottom: 14px;
+    }
+    .timeline-axis-list { position: relative; padding-left: 22px; }
+    .timeline-axis-list::before {
+      content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px;
+      width: 3px; border-radius: 3px; background: #E3E8F2;
+    }
+    .timeline-node {
+      position: relative; padding: 0 0 18px 18px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .timeline-node:last-child { padding-bottom: 0; }
+    .timeline-node .dot {
+      position: absolute; left: -19px; top: 2px; width: 14px; height: 14px;
+      border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 3px currentColor;
+      background: #fff; z-index: 1;
+    }
+    .timeline-node.ok .dot { color: var(--ok); }
+    .timeline-node.maybe .dot { color: var(--maybe); }
+    .timeline-node.no .dot { color: #C9CFD6; }
+    .timeline-node .date {
+      flex-shrink: 0; width: 64px; font-size: 12px; font-weight: bold;
+      color: var(--ink); line-height: 1.4; margin-top: 1px;
+    }
+    .timeline-node .date small {
+      display: block; font-size: 11px; color: var(--ink-sub); font-weight: normal;
+    }
+    .timeline-node .card {
+      flex: 1; min-width: 0; background: #F8FAFC; border: 1px solid var(--line);
+      border-radius: 10px; padding: 10px 12px; cursor: pointer; transition: all 0.18s;
+    }
+    .timeline-node .card:hover { border-color: var(--blue); background: #fff; box-shadow: 0 4px 12px rgba(24,95,165,0.08); }
+    .timeline-node .card-title {
+      font-size: 14px; font-weight: bold; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px;
+    }
+    .timeline-node .card-meta {
+      font-size: 12px; color: var(--ink-sub); line-height: 1.5;
+    }
+    .timeline-node .card-status {
+      display: inline-block; font-size: 11px; font-weight: bold;
+      padding: 1px 7px; border-radius: 999px; color: #fff; margin-left: 6px;
+    }
+    .timeline-node.ok .card-status { background: var(--ok); }
+    .timeline-node.maybe .card-status { background: var(--maybe); }
+    .timeline-node.no .card-status { background: #C9CFD6; }
+    .timeline-node .card-actions {
+      display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;
+    }
+    .timeline-node .card-actions a, .timeline-node .card-actions button {
+      font-size: 12px; padding: 4px 8px; border-radius: 6px; text-decoration: none;
+      border: 1px solid var(--line); background: #fff; color: var(--blue); cursor: pointer; transition: all 0.18s;
+    }
+    .timeline-node .card-actions a:hover, .timeline-node .card-actions button:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .timeline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--ink-sub); margin-bottom: 12px; }
+    .timeline-legend span { display: inline-flex; align-items: center; gap: 4px; }
+    .timeline-legend i { width: 12px; height: 12px; border-radius: 3px; }
+    .fav-list { max-height: 340px; overflow-y: auto; }
+    .fav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: #fff; border: 1px solid var(--line); border-radius: 12px;
+      margin-bottom: 8px; cursor: pointer; transition: all 0.18s;
+    }
+    .fav-item:hover { border-color: var(--blue); }
+    .fav-item .fav-status { flex-shrink: 0; font-size: 11px; padding: 2px 8px; border-radius: 999px; color: #fff; font-weight: bold; }
+    .fav-item .fav-status.ok { background: var(--ok); }
+    .fav-item .fav-status.maybe { background: var(--maybe); }
+    .fav-item .fav-status.no { background: #C9CFD6; }
+    .fav-item .fav-status.ended { background: #8A97A5; }
+    .fav-item .fav-info { flex: 1; min-width: 0; }
+    .fav-item .fav-title { font-size: 14px; font-weight: bold; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fav-item .fav-sub { font-size: 12px; color: var(--ink-sub); }
+    .fav-item .fav-time { font-size: 12px; margin-top: 3px; display: flex; flex-wrap: wrap; gap: 2px 12px; color: #1F5C99; }
+    .fav-item .fav-time .t-dead { color: #B45309; font-weight: 600; }
+    .fav-item .fav-del { color: #C9CFD6; cursor: pointer; font-size: 18px; padding: 4px; }
+    .fav-item .fav-del:hover { color: var(--no); }
+
+    /* 弹窗 */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(18,32,48,0.5); z-index: 100;
+      justify-content: center; align-content: flex-end;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff; width: 100%; max-width: 640px; max-height: 85vh;
+      border-radius: 20px 20px 0 0; padding: 14px 24px 24px; overflow-y: auto;
+      animation: slideUp 0.25s ease;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.18);
+    }
+    .modal::before {
+      content: ""; display: block; width: 40px; height: 4px;
+      background: #D8E0EA; border-radius: 4px; margin: 4px auto 14px;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #EDF1F6;
+    }
+    .modal-title { font-size: 17px; font-weight: bold; color: var(--blue-deep); }
+    .modal-close {
+      font-size: 18px; color: var(--ink-sub); background: #F2F5F9; border: none; cursor: pointer;
+      width: 32px; height: 32px; border-radius: 50%; line-height: 30px; text-align: center;
+      transition: all 0.18s; flex-shrink: 0;
+    }
+    .modal-close:hover { background: var(--blue-soft); color: var(--blue); }
+    .modal-row {
+      margin-bottom: 12px; font-size: 14px;
+      background: #F8FAFC; border-radius: 10px; padding: 10px 12px;
+      line-height: 1.75; word-break: normal; overflow-wrap: anywhere;
+    }
+    .modal-label {
+      color: var(--blue); font-size: 12px; margin-bottom: 3px;
+      font-weight: bold; letter-spacing: 0.5px;
+    }
+    .modal-inline { display: flex; gap: 8px; align-items: flex-start; }
+    .modal-status-chip {
+      flex: 0 0 auto; font-size: 12px; font-weight: bold; color: #fff;
+      border-radius: 20px; padding: 1px 10px; line-height: 20px; margin-top: 3px;
+    }
+    .modal-status-chip.ok { background: #12A150; }
+    .modal-status-chip.maybe { background: #E08700; }
+    .modal-status-chip.no { background: #D74B4B; }
+    .modal-row details { margin-top: 4px; }
+    .modal-row details > summary {
+      cursor: pointer; color: var(--blue); font-size: 13px; list-style: none;
+      padding: 3px 0; user-select: none;
+    }
+    .modal-row details > summary::-webkit-details-marker { display: none; }
+    .modal-row details > summary::before { content: '▸ '; }
+    .modal-row details[open] > summary::before { content: '▾ '; }
+    .modal-row details > div { margin-top: 4px; color: var(--ink-sub); font-size: 13px; line-height: 1.7; }
+    .modal-link {
+      display: inline-block; padding: 10px 16px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-bright));
+      color: #fff !important; border-radius: 10px; text-align: center;
+      text-decoration: none; font-size: 14px; font-weight: bold;
+      box-shadow: 0 4px 12px rgba(24,95,165,0.3);
+      transition: all 0.2s; border: none;
+    }
+    .modal-link:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(24,95,165,0.4); }
+
+    /* 免责声明 + 分组折叠 + 移动端适配 */
+    .disclaimer { background:#FFF8E1; border:1px solid #F5E1A4; color:#8A6D1B; font-size:12.5px; padding:8px 12px; border-radius:10px; margin:10px 0; line-height:1.6; }
+    .disclaimer b { color:#B45309; }
+    .disclaimer #dataUpdated { font-weight:bold; color:#B45309; }
+    .notice { background:#EAF2FB; border:1px solid #BBD6F2; color:#1F5C99; font-size:12.5px; padding:9px 13px; border-radius:10px; margin:10px 0; line-height:1.7; }
+    .notice b { color:#185FA5; }
+    .notice .guide-head { display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer; user-select:none; font-weight:bold; color:#185FA5; }
+    .notice .guide-head .guide-arrow { flex:none; font-weight:normal; opacity:.75; }
+    .notice ul { margin:8px 0 2px; padding-left:18px; }
+    .notice li { margin:4px 0; }
+    .job-foot { display:flex; align-items:center; gap:8px; margin-top:11px; min-height:26px; flex-wrap:wrap; padding-right:48px; }
+    .job-src { margin-left:auto; display:inline-flex; align-items:center; gap:3px; font-size:12px; font-weight:600; color:#fff; background:var(--blue); padding:5px 13px; border-radius:999px; text-decoration:none; transition:all .2s; white-space:nowrap; }
+    .job-src:hover { background:var(--blue-deep); box-shadow:0 4px 12px rgba(43,92,230,.28); transform:translateY(-1px); }
+    .job-src.fallback { background:#7C8AA0; }
+    .job-src.fallback:hover { background:#5B6478; }
+    .group-toggle { font-size:13px; color:var(--blue); cursor:pointer; padding:9px 4px; margin-top:8px; user-select:none; border-top:1px dashed var(--line); }
+    .group-toggle:hover { text-decoration:underline; }
+    .group-body { margin-top:2px; }
+    .job-more { display:inline-block; font-size:11.5px; color:#8AA0B5; margin-top:6px; }
+    .job-foot { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px; padding-right:48px; }
+    .job-att { font-size:12px; color:var(--blue); text-decoration:none; border:1px solid var(--line); border-radius:6px; padding:2px 7px; }
+    .job-att:hover { background:var(--blue); color:#fff; }
+    .card-warn { font-size:11.5px; color:#9a6b00; background:#fff7e0; border:1px solid #ffe2a8; border-radius:6px; padding:5px 8px; margin-top:7px; }
+    .badge-conf { display:inline-block; font-size:11px; padding:1px 7px; border-radius:10px; font-weight:600; white-space:nowrap; }
+    .conf-ok { color:#0a7d3e; background:#e4f7ec; border:1px solid #b6e6cb; }
+    .conf-off { color:#3a6ea5; background:#eaf2fb; border:1px solid #c6ddf5; }
+    .conf-warn { color:#9a6b00; background:#fff7e0; border:1px solid #ffe2a8; }
+    .modal-links { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .modal-link { font-size:13px; color:var(--blue); text-decoration:none; border:1px solid var(--blue); border-radius:6px; padding:5px 10px; }
+    .modal-link:hover { background:var(--blue); color:#fff; }
+    .group-highlight { animation: groupPulse 1.2s ease; }
+    @keyframes groupPulse {
+      0% { background: rgba(43,92,230,0.08); }
+      100% { background: transparent; }
+    }
+    @media (max-width: 640px) {
+      .header h1 { font-size:20px; }
+      .header p { font-size:12.5px; }
+      .stage-nav { gap:6px; flex-wrap:wrap; }
+      .stage-tab { padding:7px 10px; font-size:13px; }
+      .container { padding:10px; }
+      .card { padding:14px; }
+      .form-group label { font-size:13px; }
+      .options { gap:6px 10px; }
+      .options label { font-size:13px; }
+      .disclaimer #dataUpdated { display:block; margin-top:3px; }
+      .job-title { font-size:14px; }
+      .summary { font-size:13px; }
+      .summary-item .n { font-size:22px; }
+      .summary-item .t { font-size:11px; }
+      .fab-timeline { padding: 10px 14px; font-size:13px; right: 10px; bottom: 16px; }
+      /* 筛选栏在窄屏堆叠：城市/状态两个下拉改为整行宽度，避免挤压 */
+      .filter-bar { flex-direction: column; align-items: stretch; text-align: left; }
+      .filter-bar select, .filter-bar input[type="text"] { width: 100% !important; flex: none; }
+      .filter-bar .switch { align-self: flex-end; }
+
+    /* 2027届提前批最新官方公告面板 */
+    .trends-card{margin:14px auto 0;max-width:1100px;background:#fff;border:1px solid #E3ECF5;border-radius:14px;padding:16px 18px;box-shadow:0 2px 10px rgba(24,95,165,.06);}
+    .trends-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+    .trends-title{font-size:16px;font-weight:700;color:#185FA5;}
+    .trends-sub{font-size:12px;color:#8A94A6;}
+    .trend-item{font-size:13px;line-height:1.55;padding:10px 12px;border-radius:8px;margin-bottom:10px;background:#EAF4FF;border-left:3px solid #185FA5;}
+    .trend-item b{color:#185FA5;}
+    .trend-meta{color:#8A94A6;font-size:12px;margin-top:3px;}
+    .trend-link{display:inline-block;margin-top:7px;font-size:12px;color:#fff;background:#185FA5;padding:3px 11px;border-radius:6px;text-decoration:none;}
+    .trend-link:hover{background:#0F4C8A;}
+    .trend-empty{color:#8A94A6;font-size:13px;padding:8px 0;}
+    .trends-foot{font-size:12px;color:#8A94A6;margin-top:6px;padding-top:10px;border-top:1px dashed #E3ECF5;}
+  </style>
+
+  <!-- 百度统计 -->
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?23483745";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+</head>
+<body>
+  <div class="header">
+    <div class="hero-badge">✨ 师元在手 · 编制你有</div>
+    <h1>浙江教师提前批 · 报考资格匹配</h1>
+    <p class="slogan">填好你的档案，立刻看清 2027 届提前批你能报哪些编制岗</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" id="statJobs">—</div><div class="lab">提前批批次</div></div>
+      <div class="hero-stat"><div class="num" id="statCities">—</div><div class="lab">覆盖地市</div></div>
+    </div>
+  </div>
+
+  <div class="notice" id="usageGuide">
+    <div class="guide-head" onclick="toggleGuide()">
+      <span>📌 使用须知 · 2026 年公告，供 2027 届参考，以原公告为准</span>
+      <span class="guide-arrow" id="guideArrow">展开 ▾</span>
+    </div>
+    <div id="guideBody" style="display:none;">
+      <ul>
+        <li><b>怎么筛的：</b>按各批次官方公告的报考条件硬筛选，每条结论都附原因；「可报名」≠ 符合岗位全部条件。</li>
+        <li><b>匹配维度：</b>毕业院校（含双一流/精英班）、学历、师范类、户籍·生源地、应届身份、综合排名、荣誉奖项（含党员身份）、专项身份、报考学科岗位、教师资格证、普通话等级。</li>
+        <li><b>以原公告为准：</b>专业对口、年龄、高考分数等细节写在岗位表里，标「公告无门槛」的批次也要对照岗位表核对。</li>
+        <li><b>公告来源：</b>均为 2026 年发布（浙江师元教师考试公众号）；每张卡片「查看原公告 ↗」跳对应公告，未精确匹配的跳汇总总文章。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="section-title">填写我的档案</div>
+      <!-- 1 身份信息 -->
+      <div class="form-section">
+        <div class="form-section-head"><span class="num">1</span>身份信息</div>
+        <div class="form-group">
+                <label>届别</label>
+                <div class="options" id="graduateYear">
+                  <label><input type="radio" name="graduateYear" value="2026"> 2026届</label>
+                  <label><input type="radio" name="graduateYear" value="2027"> 2027届</label>
+                  <label><input type="radio" name="graduateYear" value="other"> 往届/其他</label>
+                </div>
+                <div class="hint">2026届及往届毕业生可以报"社招"类岗位；提前批一般只面向应届生。</div>
+              </div>
+        <div class="form-group">
+                <label>户籍所在地</label>
+                <div class="options" id="region" style="margin-bottom:10px;">
+                  <label><input type="radio" name="region" value="zhejiang"> 浙江省内</label>
+                  <label><input type="radio" name="region" value="other"> 省外</label>
+                </div>
+                <div id="zhejiangHukouBox" style="display:flex;gap:10px;">
+                  <select id="hukouCity" style="flex:1;margin-bottom:0;"><option value="">请选择市</option></select>
+                  <select id="hukouDistrict" style="flex:1;margin-bottom:0;"><option value="">请先选择市</option></select>
+                </div>
+                <div id="otherProvinceBox" style="display:none;">
+                  <select id="otherProvince"><option value="">请选择省份</option></select>
+                </div>
+              </div>
+        <div class="form-group">
+                <label>政治面貌（选填，个别岗位要求党员）</label>
+                <div class="options" id="politicalStatus">
+                  <label><input type="radio" name="politicalStatus" value="中共党员"> 中共党员（含预备党员）</label>
+                  <label><input type="radio" name="politicalStatus" value="共青团员"> 共青团员</label>
+                  <label><input type="radio" name="politicalStatus" value=""> 群众/未填</label>
+                </div>
+                <div id="youxiuPartyBox" style="display:none;margin-top:10px;padding:10px 12px;background:#F5F9FF;border:1px solid #D7E6FA;border-radius:10px;">
+                  <div style="font-size:13px;color:var(--blue);font-weight:bold;margin-bottom:6px;">是否获得过「优秀共产党员 / 优秀党员」称号？</div>
+                  <div class="options" id="honorsParty">
+                    <label><input type="checkbox" value="优秀共产党员"> 是，获得过优秀共产党员 / 优秀党员</label>
+                    <label><input type="checkbox" value="否"> 否，没获得过</label>
+                  </div>
+                </div>
+                <div class="hint">多数教师岗不限政治面貌；部分批次把党员身份作为荣誉替代项，勾选后匹配更准。</div>
+              </div>
+        <div class="form-group">
+                <label>特殊身份（选填，提前批资格常按这些身份放宽）</label>
+                <div class="options" id="specialStatus">
+                  <label><input type="checkbox" value="公费师范生"> 公费师范生</label>
+                  <label><input type="checkbox" value="复硕培养"> 复硕培养试点（本硕衔接）</label>
+                  <label><input type="checkbox" value="国优计划"> 国优计划（国家优秀中小学教师培养计划）</label>
+                  <label><input type="checkbox" value="初阳经亨颐"> 初阳学院/经亨颐学院（精英班）</label>
+                  <label><input type="checkbox" value="一表或特控线"> 高考一段线/特控线录取</label>
+                </div>
+                <div class="hint">勾选后匹配"公费师范/复硕/国优计划/初阳经亨颐/第一批特控线录取"等提前批资格条款更准。</div>
+              </div>
+      </div>
+
+      <!-- 2 学历 · 院校 · 专业 -->
+      <div class="form-section">
+        <div class="form-section-head"><span class="num">2</span>学历 · 院校 · 专业</div>
+        <div class="form-group">
+                <label>学历</label>
+                <div class="options" id="degree">
+                  <label><input type="radio" name="degree" value="本科"> 本科</label>
+                  <label><input type="radio" name="degree" value="硕士"> 硕士</label>
+                  <label><input type="radio" name="degree" value="博士"> 博士</label>
+                </div>
+                <div class="hint">浙江教师编制岗基本都要求本科起步，硕士可报岗位更多、不少地区还放宽户籍；博士可报高层次人才引进等更高门槛岗位。</div>
+              </div>
+        <div class="form-group">
+                <label>出生年份（用于年龄门槛核对，最终以公告为准）</label>
+                <input type="number" id="birthYear" min="1980" max="2012" placeholder="如：2004"
+                       style="width:160px;padding:9px 12px;font-size:14px;border:1px solid #D0D7DE;border-radius:8px;box-sizing:border-box;">
+                <div class="hint">提前批普遍年龄要求（通用线）：本科≤25、硕士≤30、博士≤35周岁（部分地区硕士28/博士35）。填了才按年龄核对；不填则不判断。</div>
+              </div>
+        <div class="form-group">
+                <label>院校类型</label>
+                <div class="options" id="schoolType">
+                  <label><input type="radio" name="schoolType" value="domestic" checked> 国内院校</label>
+                  <label><input type="radio" name="schoolType" value="overseas_top100"> 国（境）外世界排名前100高校</label>
+                  <label><input type="radio" name="schoolType" value="overseas_other"> 国（境）外其他高校</label>
+                </div>
+                <div class="hint">海外院校毕业生可按「国（境）外学历学位认证」条款报考（如杭州临平/钱塘、丽水多县等）。选海外后下方校名栏自动隐藏，直接按对应院校层级匹配。</div>
+              </div>
+        <div class="form-group" id="schoolNameBox">
+                <label id="schoolTypeLabel">毕业院校（本科阶段 · 提前批资格判断核心）</label>
+                <input type="text" id="schoolName" list="schoolList" autocomplete="off"
+                       placeholder="直接输入校名，如：嘉兴大学（不在名单里也照填，或留空）"
+                       style="width:100%;padding:9px 12px;font-size:14px;border:1px solid #D0D7DE;border-radius:8px;box-sizing:border-box;">
+                <datalist id="schoolList"></datalist>
+                <div id="schoolTierHint" style="display:none;margin-top:8px;font-size:12.5px;line-height:1.7;padding:8px 11px;border-radius:8px;"></div>
+                <div class="hint">
+                  <b>不在名单里？留空、照填都行</b>——系统按「普通本科」匹配，不影响其他条件的判定。
+                  <details><summary>为什么还要填毕业院校？</summary>公告里的「<b>国内部分高校</b>（详见附件）」经核实=《第二轮双一流建设高校名单》(147所)；「浙江省重点建设高校」是另一份名单(15所)，<b>两者不是同一份</b>，仅浙大、宁波大学、中国美院重合。填了才能精确判定，不填只影响少数要求名校的岗位。</details>
+                </div>
+              </div>
+        <div class="form-group" id="eliteClassBox" style="display:none;">
+                <label id="eliteClassLabel">是否精英班 / 荣誉学院</label>
+                <div class="options" id="eliteClass"></div>
+                <div class="hint" id="eliteClassHint"></div>
+              </div>
+        <div class="form-group" id="masterSchoolBox" style="display:none;">
+                <label>研究生毕业院校（硕士/博士选填）</label>
+                <input type="text" id="masterSchoolName" list="schoolList" autocomplete="off"
+                       placeholder="不填 / 与本科院校相同"
+                       style="width:100%;padding:9px 12px;font-size:14px;border:1px solid #D0D7DE;border-radius:8px;box-sizing:border-box;">
+                <div class="hint">提前批条款多数约束的是<b>本科院校</b>；部分批次看研究生院校。两处都填时系统取<b>并集</b>判定（任一所在名单满足即算），匹配结论里会写明命中的是哪条原文，便于你核对。</div>
+              </div>
+        <div class="form-group" id="bachelorMajorBox">
+                <label>本科专业（选填）</label>
+                <input type="text" id="bachelorMajor" list="majorDatalist" placeholder="如：数学与应用数学 / 汉语言文学 / 美术学 / 体育教育……" style="width:100%; padding:9px 12px; border:1px solid #D0D7DE; border-radius:8px; font-size:14px;">
+                <datalist id="majorDatalist">
+                  <option>汉语言文学</option><option>汉语言</option><option>汉语国际教育</option><option>中国语言文学类</option><option>古典文献学</option>
+                  <option>数学与应用数学</option><option>信息与计算科学</option><option>数理基础科学</option>
+                  <option>英语</option><option>商务英语</option><option>翻译</option>
+                  <option>科学教育</option><option>物理学</option><option>化学</option><option>生物科学</option><option>地理科学</option>
+                  <option>历史学</option><option>世界史</option><option>思想政治教育</option><option>政治学与行政学</option><option>马克思主义理论</option>
+                  <option>美术学</option><option>绘画</option><option>雕塑</option><option>中国画</option><option>书法学</option><option>艺术教育</option>
+                  <option>音乐学</option><option>音乐表演</option><option>舞蹈学</option><option>舞蹈表演</option>
+                  <option>体育教育</option><option>运动训练</option><option>社会体育指导与管理</option><option>武术与民族传统体育</option><option>休闲体育</option>
+                  <option>计算机科学与技术</option><option>软件工程</option><option>网络工程</option><option>教育技术学</option><option>数据科学与大数据技术</option>
+                  <option>心理学</option><option>应用心理学</option>
+                  <option>特殊教育</option><option>学前教育</option>
+                  <option>小学教育</option><option>小学教育（数学方向）</option><option>小学教育（语文方向）</option><option>小学教育（英语方向）</option><option>小学教育（科学方向）</option><option>小学教育（体育方向）</option>
+                  <option>机械设计制造及其自动化</option><option>电子信息工程</option><option>电气工程及其自动化</option>
+                </datalist>
+                <div class="hint">填了本科专业，系统会自动对应到学科（如「美术学/绘画」→美术、「体育教育/运动训练」→体育、「汉语国际教育」→语文）。不确定自己专业对应哪个学科，直接点下面的方向按钮即可。</div>
+              </div>
+        <div class="form-group">
+                <label>专业是否为师范类</label>
+                <div class="options" id="normalMajor">
+                  <label><input type="radio" name="normalMajor" value="师范类"> 师范类</label>
+                  <label><input type="radio" name="normalMajor" value="非师范类"> 非师范类</label>
+                  <label><input type="radio" name="normalMajor" value=""> 不限/不确定</label>
+                </div>
+                <div class="hint">个别地区（多见于提前批）要求必须是师范类专业才能报考；师范生选「师范类」匹配更准，非师范生会被直接判部分岗位不符。</div>
+              </div>
+        <div class="form-group">
+                <label id="majorLabel">专业（决定你能报哪个学科方向）</label>
+                <div class="options" id="major">
+                  <label data-stages="小学,初中,高中"><input type="radio" name="major" value="语文"> 语文</label>
+                  <label data-stages="小学,初中,高中"><input type="radio" name="major" value="数学"> 数学</label>
+                  <label data-stages="小学,初中,高中"><input type="radio" name="major" value="英语"> 英语</label>
+                  <label data-stages="小学,初中"><input type="radio" name="major" value="科学"> 科学</label>
+                  <label data-stages="小学"><input type="radio" name="major" value="特殊教育"> 特殊教育</label>
+                  <label data-stages="初中,高中"><input type="radio" name="major" value="道德与法治"> 道德与法治</label>
+                  <label data-stages="初中"><input type="radio" name="major" value="历史与社会"> 历史与社会</label>
+                  <label data-stages="高中"><input type="radio" name="major" value="思想政治"> 思想政治</label>
+                  <label data-stages="高中"><input type="radio" name="major" value="物理"> 物理</label>
+                  <label data-stages="高中"><input type="radio" name="major" value="化学"> 化学</label>
+                  <label data-stages="高中"><input type="radio" name="major" value="生物"> 生物</label>
+                  <label data-stages="高中"><input type="radio" name="major" value="历史"> 历史</label>
+                  <label data-stages="高中"><input type="radio" name="major" value="地理"> 地理</label>
+                  <label data-stages="高中"><input type="radio" name="major" value="通用技术"> 通用技术</label>
+                  <label data-stages="小学,初中,高中"><input type="radio" name="major" value="体育"> 体育</label>
+                  <label data-stages="小学,初中,高中"><input type="radio" name="major" value="音乐"> 音乐</label>
+                  <label data-stages="小学,初中,高中"><input type="radio" name="major" value="美术"> 美术</label>
+                  <label data-stages="小学,初中,高中"><input type="radio" name="major" value="信息技术"> 信息技术</label>
+                  <label data-stages="小学,初中,高中"><input type="radio" name="major" value="心理健康"> 心理健康</label>
+                  <label data-stages="小学"><input type="radio" name="major" value="小学教育"> 小学教育</label>
+                  <label data-stages="幼儿园"><input type="radio" name="major" value="学前教育"> 学前教育</label>
+                  <label data-stages="幼儿园,小学,初中,高中"><input type="radio" name="major" value="custom"> 其他</label>
+                </div>
+                <input type="text" id="majorCustom" placeholder="如：小学教育（数学方向）填这里，会自动识别学科" style="display:none; width:100%; padding:9px 12px; border:1px solid #D0D7DE; border-radius:8px; font-size:14px; margin-top:8px;">
+                <div id="majorXiaoxueBox" style="display:none; margin-top:10px;">
+                  <div class="cert-group-title">小学教育 · 选择你的学科方向</div>
+                  <div class="options" id="majorXiaoxue">
+                    <label data-stages="小学"><input type="radio" name="major" value="小学教育（数学方向）"> 数学方向</label>
+                    <label data-stages="小学"><input type="radio" name="major" value="小学教育（语文方向）"> 语文方向</label>
+                    <label data-stages="小学"><input type="radio" name="major" value="小学教育（其他方向）"> 其他方向（按教资学科报考）</label>
+                  </div>
+                  <div class="hint">⚠️ 部分地区（尤其中学数学岗）专业目录<b>不含小学教育</b>，即使有初中数学教资也需电话确认——这类岗位系统会标「待确认」提醒你。<br>选「其他方向」时按你的教资学科判断可报学科。</div>
+                </div>
+                <div class="hint">小学教育选「数学方向/语文方向/其他方向」，系统自动识别对应学科；特殊教育没有独立学段，统一放在「小学」里。</div>
+              </div>
+      </div>
+
+      <!-- 3 教师资格 · 普通话 -->
+      <div class="form-section">
+        <div class="form-section-head"><span class="num">3</span>教师资格 · 普通话</div>
+        <div class="form-group">
+                <label>教师资格证（可多选，高学段教资可报低学段岗位）</label>
+                <div class="options" id="certStageSwitch" style="margin-bottom:8px;">
+                  <label><input type="radio" name="certStage" value="幼儿园"> 幼儿园</label>
+                  <label><input type="radio" name="certStage" value="小学" checked> 小学</label>
+                  <label><input type="radio" name="certStage" value="初中"> 初中</label>
+                  <label><input type="radio" name="certStage" value="高中"> 高中</label>
+                </div>
+                <div class="hint" id="certStageHint" style="margin-bottom:6px;"></div>
+        
+                <div class="cert-stage-box" data-stage="幼儿园" style="display:none;">
+                  <div class="cert-group-title">幼儿园教师资格</div>
+                  <div class="options" id="certsKg">
+                    <label><input type="checkbox" value="幼儿园教师资格"> 幼儿园教师资格</label>
+                  </div>
+                </div>
+        
+                <div class="cert-stage-box" data-stage="小学">
+                  <div class="cert-group-title">小学教师资格</div>
+                  <div class="options" id="certsPrimary">
+                    <label><input type="checkbox" value="小学语文"> 语文</label>
+                    <label><input type="checkbox" value="小学数学"> 数学</label>
+                    <label><input type="checkbox" value="小学英语"> 英语</label>
+                    <label><input type="checkbox" value="小学科学"> 科学</label>
+                    <label><input type="checkbox" value="小学道德与法治"> 道德与法治</label>
+                    <label><input type="checkbox" value="小学音乐"> 音乐</label>
+                    <label><input type="checkbox" value="小学体育"> 体育</label>
+                    <label><input type="checkbox" value="小学美术"> 美术</label>
+                    <label><input type="checkbox" value="小学信息技术"> 信息技术</label>
+                    <label><input type="checkbox" value="小学心理健康"> 心理健康</label>
+                    <label><input type="checkbox" value="小学全科"> 全科</label>
+                    <label><input type="checkbox" value="小学特殊教育"> 特殊教育</label>
+                  </div>
+                </div>
+        
+                <div class="cert-stage-box" data-stage="初中" style="display:none;">
+                  <div class="cert-group-title">初中教师资格</div>
+                  <div class="options" id="certsJunior">
+                    <label><input type="checkbox" value="初中语文"> 语文</label>
+                    <label><input type="checkbox" value="初中数学"> 数学</label>
+                    <label><input type="checkbox" value="初中英语"> 英语</label>
+                    <label><input type="checkbox" value="初中物理"> 物理</label>
+                    <label><input type="checkbox" value="初中化学"> 化学</label>
+                    <label><input type="checkbox" value="初中生物"> 生物</label>
+                    <label><input type="checkbox" value="初中科学"> 科学</label>
+                    <label><input type="checkbox" value="初中道德与法治"> 道德与法治</label>
+                    <label><input type="checkbox" value="初中历史与社会"> 历史与社会</label>
+                    <label><input type="checkbox" value="初中历史"> 历史</label>
+                    <label><input type="checkbox" value="初中地理"> 地理</label>
+                    <label><input type="checkbox" value="初中音乐"> 音乐</label>
+                    <label><input type="checkbox" value="初中体育"> 体育</label>
+                    <label><input type="checkbox" value="初中美术"> 美术</label>
+                    <label><input type="checkbox" value="初中信息技术"> 信息技术</label>
+                    <label><input type="checkbox" value="初中心理健康"> 心理健康</label>
+                    <label><input type="checkbox" value="初中全科"> 全科</label>
+                  </div>
+                </div>
+        
+                <div class="cert-stage-box" data-stage="高中" style="display:none;">
+                  <div class="cert-group-title">高中教师资格</div>
+                  <div class="options" id="certsSenior">
+                    <label><input type="checkbox" value="高中语文"> 语文</label>
+                    <label><input type="checkbox" value="高中数学"> 数学</label>
+                    <label><input type="checkbox" value="高中英语"> 英语</label>
+                    <label><input type="checkbox" value="高中物理"> 物理</label>
+                    <label><input type="checkbox" value="高中化学"> 化学</label>
+                    <label><input type="checkbox" value="高中生物"> 生物</label>
+                    <label><input type="checkbox" value="高中思想政治"> 思想政治</label>
+                    <label><input type="checkbox" value="高中历史"> 历史</label>
+                    <label><input type="checkbox" value="高中地理"> 地理</label>
+                    <label><input type="checkbox" value="高中音乐"> 音乐</label>
+                    <label><input type="checkbox" value="高中体育"> 体育</label>
+                    <label><input type="checkbox" value="高中美术"> 美术</label>
+                    <label><input type="checkbox" value="高中信息技术"> 信息技术</label>
+                    <label><input type="checkbox" value="高中通用技术"> 通用技术</label>
+                    <label><input type="checkbox" value="高中心理健康"> 心理健康</label>
+                  </div>
+                </div>
+              </div>
+        <div class="form-group">
+                <label>普通话等级（语文岗普遍要求二甲，其他学科一般二乙）</label>
+                <div class="options" id="putonghua">
+                  <label><input type="radio" name="putonghua" value="二甲及以上"> 二甲及以上</label>
+                  <label><input type="radio" name="putonghua" value="二乙"> 二级乙等</label>
+                  <label><input type="radio" name="putonghua" value=""> 其他/未考取</label>
+                </div>
+                <div class="hint">普通话是教师资格认定必备项：语文（含小学语文）要求二甲，其余学科二乙即可。</div>
+              </div>
+      </div>
+
+      <!-- 4 荣誉奖项 · 其他补充 -->
+      <div class="form-section">
+        <div class="form-section-head"><span class="num">4</span>荣誉奖项 · 其他补充</div>
+        <div class="form-group">
+                <label>荣誉奖项</label>
+                <div class="cert-group-title">荣誉称号</div>
+                <div class="options" id="honors">
+                  <label><input type="checkbox" value="省级优秀毕业生"> 省级优秀毕业生</label>
+                  <label><input type="checkbox" value="校级优秀毕业生"> 校级优秀毕业生</label>
+                  <label><input type="checkbox" value="优秀学生干部"> 优秀学生干部</label>
+                  <label><input type="checkbox" value="优秀团干部"> 优秀团干部</label>
+                  <label><input type="checkbox" value="优秀学生"> 优秀学生</label>
+                  <label><input type="checkbox" value="优秀团员"> 优秀团员</label>
+                  <label><input type="checkbox" value="三好学生"> 三好学生</label>
+                  <label><input type="checkbox" value="院级荣誉"> 院级荣誉/院级奖学金</label>
+                </div>
+                <div class="cert-group-title">奖学金（按等级勾选）</div>
+                <div class="options" id="honorsScholarship">
+                  <label><input type="checkbox" value="国家奖学金"> 国家奖学金</label>
+                  <label><input type="checkbox" value="国家励志奖学金"> 国家励志奖学金</label>
+                  <label><input type="checkbox" value="省政府奖学金"> 省政府奖学金</label>
+                  <label><input type="checkbox" value="校级一等奖学金"> 校级一等</label>
+                  <label><input type="checkbox" value="校级二等奖学金"> 校级二等</label>
+                  <label><input type="checkbox" value="校级三等奖学金"> 校级三等</label>
+                  <label><input type="checkbox" value="校级单项奖学金"> 校级单项</label>
+                </div>
+                <div class="cert-group-title">奖学金获得次数（部分公告要求"两次校级二等及以上"）</div>
+                <select id="scholarshipTimes">
+                  <option value="">不填/1次</option>
+                  <option value="2">2次</option>
+                  <option value="3">3次及以上</option>
+                </select>
+                <div class="hint">仅当你在上方勾选了奖学金且确实多次获得时选择；义乌等提前批有"两次校级二等及以上奖学金"条款。</div>
+                <div class="cert-group-title">省级师范生技能竞赛</div>
+                <div class="options" id="honorsContest">
+                  <label><input type="checkbox" value="省级师范生技能竞赛一等奖"> 一等奖</label>
+                  <label><input type="checkbox" value="省级师范生技能竞赛二等奖"> 二等奖</label>
+                  <label><input type="checkbox" value="省级师范生技能竞赛三等奖"> 三等奖</label>
+                </div>
+                <div class="cert-group-title">学科/教学竞赛（提前批常见条款）</div>
+                <div class="options" id="honorsAcademic">
+                  <label><input type="checkbox" value="全国师范生教学技能竞赛获奖"> 全国师范生教学技能竞赛获奖</label>
+                  <label><input type="checkbox" value="省级学科竞赛一等奖"> 省级学科竞赛一等奖</label>
+                  <label><input type="checkbox" value="省级学科竞赛二等奖"> 省级学科竞赛二等奖</label>
+                  <label><input type="checkbox" value="省级学科竞赛三等奖"> 省级学科竞赛三等奖</label>
+                  <label><input type="checkbox" value="高中学科奥赛省级获奖"> 高中学科奥赛省级获奖</label>
+                  <label><input type="checkbox" value="全国大学生竞赛获奖"> 全国大学生竞赛获奖</label>
+                </div>
+                <div class="cert-group-title">综合测评 / 专业排名</div>
+                <select id="zongce">
+                  <option value="">请选择（部分岗位可用排名代替荣誉）</option>
+                  <option value="5">前5%以内</option>
+                  <option value="10">前10%以内</option>
+                  <option value="20">前20%以内</option>
+                  <option value="25">前25%以内</option>
+                  <option value="30">前30%以内</option>
+                  <option value="40">前40%以内</option>
+                  <option value="50">前50%以内</option>
+                </select>
+              </div>
+        <div class="form-group">
+                <label>其他条件（选填，可合并填写）</label>
+                <div class="custom-honor-row" style="margin-bottom:8px;">
+                  <input type="text" id="customHonorInput" placeholder="其他荣誉/奖项，如：省大学生数学竞赛二等奖" maxlength="30">
+                  <button onclick="addCustomHonor()">添加</button>
+                </div>
+                <div id="customHonors" class="options" style="margin-top:8px;"></div>
+                <textarea id="otherConditions" rows="2" placeholder="其他报考条件，如：服务期5年、限本地生源、须有某证书等，写在这里"></textarea>
+                <div class="hint">添加的荣誉标签点 × 可删除；「其他条件」只是你自己的记录，<b>不参与自动匹配</b>，结果页会原样回显提醒你对照公告核对。</div>
+              </div>
+      </div>
+
+<button class="btn-save" id="saveBtn">生成我的匹配结果</button>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <div class="filter-bar">
+      <span>只看事业编 / 备案制岗位</span>
+      <label class="switch">
+        <input type="checkbox" id="bianzhiOnly" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="filter-bar" style="gap:12px;">
+      <select id="cityFilter" style="width:auto;flex:1;margin-bottom:0;padding:8px 10px;font-size:14px;"></select>
+      <select id="statusFilter" style="width:auto;flex:1;margin-bottom:0;padding:8px 10px;font-size:14px;">
+        <option value="">全部状态</option>
+        <option value="ok">可报</option>
+        <option value="maybe">待核实</option>
+        <option value="no">不可报</option>
+      </select>
+    </div>
+    <div class="filter-bar" style="gap:12px;">
+      <input id="resultSearch" type="text" placeholder="🔍 搜索：城市 / 批次 / 关键词（如：杭州、提前批）" style="width:100%;flex:1;margin-bottom:0;padding:9px 12px;font-size:14px;border:1px solid #D0D7DE;border-radius:8px;">
+    </div>
+    <div class="filter-bar" style="gap:10px;align-items:center;">
+      <span class="focusseg-label">报考学段聚焦</span>
+      <div class="focusseg" id="focusSeg">
+        <button type="button" data-stage="" class="active">全部</button>
+        <button type="button" data-stage="小学">小学</button>
+        <button type="button" data-stage="初中">初中</button>
+        <button type="button" data-stage="高中">高中</button>
+      </div>
+    </div>
+    <div id="focusHint"></div>
+    <div id="stageHint" style="font-size:12px;color:var(--ink-sub);margin:6px 0 12px;padding:8px 12px;background:#F6F8FB;border:1px solid var(--line);border-radius:10px;line-height:1.7;"></div>
+
+    <div class="card round" style="padding:16px;">
+      <div class="section-title" id="resultTitle">匹配结果</div>
+      <div id="resultArea"></div>
+    </div>
+  </div>
+
+  <!-- 详情弹窗 -->
+  <div class="modal-overlay" id="detailModal" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">批次详情</div>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-row"><div class="modal-label">地区 / 批次</div><div id="modalLocation"></div></div>
+      <div class="modal-row"><div class="modal-label">编制类型</div><div id="modalStaffing"></div></div>
+      <div class="modal-row" id="modalSchoolRow" style="display:none;"><div class="modal-label">毕业院校要求</div><div id="modalSchool"></div></div>
+      <div class="modal-row" id="modalTimelineRow" style="display:none;"><div class="modal-label">报考时间</div><div id="modalTimeline"></div></div>
+      <div class="modal-row" id="modalStageSubjectRow"><div class="modal-label">招聘学段 / 学科</div><div id="modalStageSubject"></div></div>
+      <div class="modal-row" id="modalSubjectFitRow" style="display:none;"><div class="modal-label">学科对口</div><div id="modalSubjectFit"></div></div>
+      <div class="modal-row"><div class="modal-label">岗位明细</div><div id="modalPosts"></div></div>
+      <div class="modal-row" id="modalMajorRow" style="display:none;"><div class="modal-label">专业要求</div><div id="modalMajor"></div></div>
+      <div class="modal-row"><div class="modal-label">我的匹配结果</div><div class="modal-inline"><span id="modalStatus" class="modal-status-chip"></span><span id="modalReason"></span></div></div>
+      <div class="modal-row"><div class="modal-label">报考条件原文</div><div id="modalCondition"></div></div>
+      <div class="modal-row" id="modalNotesRow" style="display:none;"><div class="modal-label">备注 / 其他说明</div><div id="modalNotes"></div></div>
+      <div class="modal-row" id="modalYuanRow"><div class="modal-label">考情解读</div><div id="modalYuan"></div></div>
+    </div>
+  </div>
+
+  <!-- 收藏/报考时间线弹窗 -->
+  <div class="modal-overlay" id="timelineModal" onclick="closeTimelineModal(event)">
+    <div class="modal timeline-modal" onclick="event.stopPropagation()">
+      <div class="timeline-head">
+        <div class="timeline-title">我的收藏 · 报考时间线</div>
+        <button class="modal-close" onclick="closeTimelineModal()">×</button>
+      </div>
+      <div class="timeline-legend">
+        <span><i style="background:var(--ok)"></i>可报</span>
+        <span><i style="background:var(--maybe)"></i>待确认</span>
+        <span><i style="background:#C9CFD6"></i>不符</span>
+        <span style="margin-left:auto;">按公告报名截止日期排序</span>
+      </div>
+      <div class="timeline-actions">
+        <button onclick="exportFavICS()">📅 导出日历(.ics)</button>
+        <button onclick="exportFavTxt()">📋 导出清单</button>
+        <button onclick="clearFavorites()">清空收藏</button>
+      </div>
+      <div style="font-size:12px;color:#8A94A6;margin:-6px 2px 10px;">💡 手机导出建议用系统自带浏览器（Safari/Chrome）打开本页；微信内打开可能会拦截文件下载。</div>
+      <div class="fav-list" id="favList"></div>
+    </div>
+  </div>
+
+  <!-- 浮动时间线入口 -->
+  <button class="fab-timeline" onclick="openTimelineModal()">
+    <span>📅</span>
+    <span>报考时间线</span>
+    <span class="badge" id="favCount">0</span>
+  </button>
+
+  <div class="site-foot">
+    <div>© 2026 浙江教师招聘智能匹配 · 数据整理自各地教育局公开招聘公告 · 仅供个人参考，结果转请至原公告</div>
+    <div class="site-foot-stat">
+      累计访问 <span id="busuanzi_value_site_pv">0</span> 次 · 访客 <span id="busuanzi_value_site_uv">0</span> 人 · 本机已完成匹配 <span id="matchCount">0</span> 次
+    </div>
+  </div>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  <script src="schools.js?v=20260919c"></script>
+  <script src="data.js?v=20260919c"></script>
+  <script src="match.js?v=20260919c"></script>
+  <script src="links.js?v=20260919c"></script>
+  <script>
+  // ========== 浙江 11 市 → 全部区县 ==========
+  const cityDistricts = {
+    "杭州": ["上城区","拱墅区","西湖区","滨江区","萧山区","余杭区","临平区","钱塘区","富阳区","临安区","桐庐县","淳安县","建德市"],
+    "宁波": ["海曙区","江北区","北仑区","镇海区","鄞州区","奉化区","象山县","宁海县","余姚市","慈溪市"],
+    "温州": ["鹿城区","龙湾区","瓯海区","洞头区","永嘉县","平阳县","苍南县","文成县","泰顺县","瑞安市","乐清市","龙港市"],
+    "嘉兴": ["南湖区","秀洲区","嘉善县","海盐县","海宁市","平湖市","桐乡市"],
+    "湖州": ["吴兴区","南浔区","德清县","长兴县","安吉县"],
+    "绍兴": ["越城区","柯桥区","上虞区","新昌县","诸暨市","嵊州市"],
+    "金华": ["婺城区","金东区","武义县","浦江县","磐安县","兰溪市","义乌市","东阳市","永康市"],
+    "衢州": ["柯城区","衢江区","常山县","开化县","龙游县","江山市"],
+    "舟山": ["定海区","普陀区","岱山县","嵊泗县"],
+    "台州": ["椒江区","黄岩区","路桥区","玉环市","三门县","天台县","仙居县","温岭市","临海市"],
+    "丽水": ["莲都区","青田县","缙云县","遂昌县","松阳县","云和县","庆元县","景宁畲族自治县","龙泉市"]
+  };
+  const otherProvinces = ["安徽","江苏","上海","江西","福建","河南","湖北","湖南","山东","四川","重庆","广东","北京","天津","河北","山西","辽宁","吉林","黑龙江","陕西","甘肃","青海","云南","贵州","广西","海南","内蒙古","新疆","西藏","宁夏","其他"];
+
+  const citySel = document.getElementById("hukouCity");
+  const districtSel = document.getElementById("hukouDistrict");
+  const provinceSel = document.getElementById("otherProvince");
+  Object.keys(cityDistricts).forEach(c => { const o=document.createElement("option"); o.value=c; o.textContent=c; citySel.appendChild(o); });
+  otherProvinces.forEach(p => { const o=document.createElement("option"); o.value=p; o.textContent=p; provinceSel.appendChild(o); });
+  citySel.addEventListener("change", function(){ districtSel.innerHTML='<option value="">请选择区县</option>'; (cityDistricts[citySel.value]||[]).forEach(d=>{ const o=document.createElement("option"); o.value=d; o.textContent=d; districtSel.appendChild(o); }); runMatch(); });
+  districtSel.addEventListener("change", runMatch);
+  provinceSel.addEventListener("change", runMatch);
+  document.querySelectorAll('input[name="region"]').forEach(r => r.addEventListener("change", function(){
+    const isZj=this.value==="zhejiang";
+    document.getElementById("zhejiangHukouBox").style.display=isZj?"flex":"none";
+    document.getElementById("otherProvinceBox").style.display=isZj?"none":"block";
+    updateHighlight("region"); runMatch();
+  }));
+
+  // 学历切换：硕士显硕士院校框（本科专业框常驻，本科/硕士都能填）
+  document.querySelectorAll('input[name="degree"]').forEach(r => r.addEventListener("change", function(){
+    const isMaster=(this.value==="硕士" && this.checked);
+    document.getElementById("masterSchoolBox").style.display=isMaster?"block":"none";
+    runMatch();
+  }));
+  document.querySelectorAll('input[name="major"]').forEach(r => r.addEventListener("change", function(){
+    const isCustom=(this.value==="custom" && this.checked);
+    document.getElementById("majorCustom").style.display=isCustom?"block":"none";
+    updateHighlight("major"); runMatch();
+  }));
+  document.getElementById("majorCustom").addEventListener("input", runMatch);
+
+  // ========== 教资学段切换（只显示当前学段的教资选项，已勾选的其他学段保留）==========
+  function switchCertStage(stage){
+    document.querySelectorAll(".cert-stage-box").forEach(box=>{
+      box.style.display = box.dataset.stage === stage ? "block" : "none";
+    });
+    const hint=document.getElementById("certStageHint");
+    if(hint) hint.textContent = "当前填写「"+stage+"」学段教资；已勾选的其他学段教资会保留，可切换学段继续勾选";
+    updateHighlight("certStageSwitch");
+  }
+  document.querySelectorAll('input[name="certStage"]').forEach(r => r.addEventListener("change", function(){ switchCertStage(this.value); runMatch(); }));
+  document.getElementById("bachelorMajor").addEventListener("input", runMatch);
+  document.getElementById("otherConditions").addEventListener("input", runMatch);
+
+  function updateHighlight(gid){
+    const g=document.getElementById(gid); if(!g) return;
+    g.querySelectorAll("label").forEach(l=>{ const i=l.querySelector("input"); if(i&&i.checked) l.classList.add("active"); else l.classList.remove("active"); });
+  }
+  ["graduateYear","degree","specialStatus","normalMajor","major","majorXiaoxue","region","certsKg","certsPrimary","certsJunior","certsSenior","honors","honorsScholarship","honorsContest","honorsAcademic","honorsParty","putonghua"].forEach(id=>{ const g=document.getElementById(id); if(g) g.addEventListener("change",()=>{ updateHighlight(id); runMatch(); }); });
+  // 使用须知横幅：默认收起，点击展开/收起（每次进入页面默认收起）
+  function toggleGuide(){
+    const b=document.getElementById('guideBody');
+    const a=document.getElementById('guideArrow');
+    const willOpen=(b.style.display==='none');
+    b.style.display=willOpen?'block':'none';
+    a.textContent=willOpen?'收起 ▴':'展开 ▾';
+  }
+  // 院校类型（国内/海外）：此前漏绑 change，点击无高亮无联动 → 补上
+  document.querySelectorAll('input[name="schoolType"]').forEach(r=>r.addEventListener("change",()=>{ updateHighlight("schoolType"); syncSchoolType(); runMatch(); }));
+  // 校名（自由输入）：实时判定名单归属 + 级联精英班选项
+  ["schoolName","masterSchoolName"].forEach(id=>{ const g=document.getElementById(id); if(g) g.addEventListener("input",()=>{ if(id==="schoolName") syncSchoolTierHint(); runMatch(); }); });
+  // 政治面貌＝中共党员时才追问「优秀共产党员」，取消党员身份则自动清空该项
+  function syncYouxiuParty(){
+    const ps=(document.querySelector('input[name="politicalStatus"]:checked')||{}).value||'';
+    const isParty=ps==='中共党员';
+    const box=document.getElementById('youxiuPartyBox');
+    if(box) box.style.display=isParty?'block':'none';
+    if(!isParty){ document.querySelectorAll('#honorsParty input').forEach(cb=>cb.checked=false); }
+    updateHighlight('honorsParty');
+  }
+  // 优秀党员追问「是/否」互斥：勾一个自动取消另一个（否＝仅党员身份，不计荣誉）
+  document.querySelectorAll('#honorsParty input').forEach(cb=>cb.addEventListener('change',function(){
+    if(this.checked){ document.querySelectorAll('#honorsParty input').forEach(o=>{ if(o!==this) o.checked=false; }); }
+  }));
+  document.querySelectorAll('input[name="politicalStatus"]').forEach(r=>r.addEventListener('change', function(){ syncYouxiuParty(); updateHighlight('politicalStatus'); runMatch(); }));
+  document.getElementById("zongce").addEventListener("change", runMatch);
+  document.getElementById("scholarshipTimes").addEventListener("change", runMatch);
+
+  // 自定义荣誉
+  let customHonors=[];
+  function addCustomHonor(){ const i=document.getElementById("customHonorInput"); const n=i.value.trim(); if(!n) return; if(customHonors.includes(n)){ i.value=""; return; } customHonors.push(n); i.value=""; renderCustomHonors(); }
+  function removeCustomHonor(n){ customHonors=customHonors.filter(h=>h!==n); renderCustomHonors(); }
+  function renderCustomHonors(){ document.getElementById("customHonors").innerHTML=customHonors.map(h=>`<span class="honor-tag" onclick="removeCustomHonor('${h.replace(/'/g,"\\'")}')">${h} <span class="del">×</span></span>`).join(""); }
+  document.getElementById("customHonorInput").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); addCustomHonor(); } });
+
+  // ========== 毕业院校：datalist 候选（可自由输入任意校名）==========
+  function buildSchoolOptions(){
+    const S=window.SCHOOLS; if(!S) return;
+    const opts=[];
+    (S.groups||[]).forEach(g=>{ g.schools.forEach(n=>opts.push(`<option value="${n}">${g.name}</option>`)); });
+    (S.special||[]).forEach(s=>opts.push(`<option value="${s.name}"></option>`));
+    const dl=document.getElementById("schoolList");
+    if(dl) dl.innerHTML=opts.join("");
+  }
+
+  // 校名归一化：别名/简称/全名包含 → 尽量归到规范校名
+  function normalizeSchool(name){
+    const n=String(name||"").trim(); if(!n) return "";
+    const S=window.SCHOOLS||{}, E=window.ELITE_PROGRAMS||{};
+    const all=[]; (S.groups||[]).forEach(g=>g.schools.forEach(s=>all.push(s)));
+    (S.special||[]).forEach(s=>all.push(s.name));
+    if(all.includes(n)) return n;
+    // 优先用 schools.js 的校名简称表（与引擎同源）
+    if(S.alias&&S.alias[n]) return S.alias[n];
+    if(E.alias&&E.alias[n]) return E.alias[n];
+    // 包含式：取最长的规范校名（「浙江大学城市学院」不会误判成「浙江大学」）
+    const hit=all.filter(s=>n.includes(s)).sort((a,b)=>b.length-a.length)[0];
+    if(hit) return hit;
+    if(S.alias){ let best=""; for(const k in S.alias){ if(n.includes(k)&&k.length>best.length) best=k; } if(best) return S.alias[best]; }
+    if(E.alias){ let best=""; for(const k in E.alias){ if(n.includes(k)&&k.length>best.length) best=k; } if(best) return E.alias[best]; }
+    return n;
+  }
+
+  // 院校名单归属提示（实时）
+  function syncSchoolTierHint(){
+    const raw=(document.getElementById("schoolName")||{}).value||"";
+    const box=document.getElementById("schoolTierHint");
+    syncEliteClass();
+    if(!box) return;
+    const n=normalizeSchool(raw);
+    if(!n){ box.style.display="none"; box.innerHTML=""; return; }
+    const S=window.SCHOOLS||{}, has=Object.prototype.hasOwnProperty.call(S.tiers||{},n);
+    const tiers=has?(S.tiers[n]||[]):null;
+    box.style.display="block";
+    if(tiers===null||!tiers.length){
+      box.style.background="#F6F7F9"; box.style.color="#5B6470"; box.style.border="1px solid #E5E8EC";
+      box.innerHTML=`「<b>${esc(n)}</b>」不在两份名单内 → 按<b>普通本科</b>匹配。这栏留空或照填都不影响结果。`;
+      return;
+    }
+    // 「国内部分高校」与「双一流」是同一份名单（已查证），展示时合并，避免重复
+    const label={"双一流":"《第二轮双一流建设高校》＝公告里的「国内部分高校」","国内部分高校":"","浙15所":"浙江省重点建设高校（15所）","部属师范6所":"教育部直属师范大学（6所）","一流学科":"一流学科建设高校","985A类":"985高校","国境外世界前100":"国（境）外世界排名前100高校","国境外其他":"国（境）外其他高校"};
+    const items=[...new Set(tiers.map(t=>label[t]!==undefined?label[t]:t).filter(Boolean))];
+    box.style.background="#EAF7EF"; box.style.color="#1F7A45"; box.style.border="1px solid #BFE5CE";
+    box.innerHTML=`✓「<b>${esc(n)}</b>」属于：`+items.map(t=>`<b>${esc(t)}</b>`).join("、")+`。可用于匹配对应要求的岗位。`;
+  }
+
+  // 院校类型切换：选海外时隐藏国内校名栏，按国（境）外院校层级匹配
+  function syncSchoolType(){
+    const t=(document.querySelector('input[name="schoolType"]:checked')||{}).value||'domestic';
+    const isOverseas = t==='overseas_top100' || t==='overseas_other';
+    const nameBox=document.getElementById('schoolNameBox');
+    const masterBox=document.getElementById('masterSchoolBox');
+    const eliteBox=document.getElementById('eliteClassBox');
+    const hint=document.getElementById('schoolTierHint');
+    const deg=(document.querySelector('input[name="degree"]:checked')||{}).value||'';
+    if(nameBox) nameBox.style.display=isOverseas?'none':'';
+    if(masterBox) masterBox.style.display=isOverseas?'none':((deg==='硕士'||deg==='博士')?'block':'none');
+    if(eliteBox && isOverseas) eliteBox.style.display='none';
+    if(isOverseas){
+      const tier=t==='overseas_top100'?'国（境）外世界排名前100高校':'国（境）外其他高校';
+      if(hint){ hint.style.display='block'; hint.style.background='#EAF7EF'; hint.style.color='#1F7A45'; hint.style.border='1px solid #BFE5CE';
+        hint.innerHTML='✓ 按<b>'+esc(tier)+'</b>匹配：可报「国（境）外学历学位认证」条款的岗位（如杭州临平/钱塘、丽水松阳/青田/缙云等）。'; }
+    } else if(hint){ hint.style.display='none'; }
+  }
+
+  // 精英班：级联到毕业院校 —— 只有该校确实设有省级精英班时才出现，且精确到「哪个班」
+  function syncEliteClass(){
+    const raw=(document.getElementById("schoolName")||{}).value||"";
+    const n=normalizeSchool(raw);
+    const E=window.ELITE_PROGRAMS||{};
+    const box=document.getElementById("eliteClassBox");
+    const wrap=document.getElementById("eliteClass");
+    const lbl=document.getElementById("eliteClassLabel");
+    const hint=document.getElementById("eliteClassHint");
+    if(!box) return;
+    const progs=(E.bySchool&&E.bySchool[n])||[];
+    if(!progs.length){
+      box.style.display="none";
+      if(wrap) wrap.innerHTML="";
+      return;
+    }
+    const prev=(document.querySelector('input[name="eliteProgram"]:checked')||{}).value||"";
+    box.style.display="";
+    if(lbl) lbl.textContent=n+" · 是否精英班 / 荣誉学院";
+    if(wrap){
+      wrap.innerHTML=progs.map(p=>`<label><input type="radio" name="eliteProgram" value="${p.id}"> ${esc(p.name)}</label>`).join("")
+        + `<label><input type="radio" name="eliteProgram" value=""> 都不是</label>`;
+      wrap.querySelectorAll("input").forEach(r=>r.addEventListener("change",()=>{ updateHighlight("eliteClass"); runMatch(); }));
+      if(prev){ const p=wrap.querySelector(`input[name="eliteProgram"][value="${prev}"]`); if(p) p.checked=true; }
+    }
+    if(hint) hint.innerHTML=`<b>省内公认的师范类精英班只有 8 个</b>，报名须提供高校证明原件＋官网公示名单。<br>各批次<b>认可范围不一样</b>：嘉兴、绍兴、金华、衢州及杭州多数批次只认 <b>浙师大初阳</b> 和 <b>杭师大经亨颐</b>；温州几乎全部、台州部分批次才认全 8 个。选准即可，系统会逐批次按原文核对。`;
+    updateHighlight("eliteClass");
+  }
+  const HONOR_MAP = {
+    '省级优秀毕业生':'shengyoubi','校级优秀毕业生':'xiaoyoubi',
+    '优秀学生干部':'youxiu','优秀团干部':'youxiu','优秀学生':'youxiu','优秀团员':'youxiu',
+    '三好学生':'sanhao','院级荣誉':'yuanji',
+    '国家奖学金':'guojiang','国家励志奖学金':'lizhi','省政府奖学金':'shengzheng',
+    '校级一等奖学金':'xiao1','校级二等奖学金':'xiao2','校级三等奖学金':'xiao3','校级单项奖学金':'xiao3',
+    '省级师范生技能竞赛一等奖':'jineng1','省级师范生技能竞赛二等奖':'jineng2','省级师范生技能竞赛三等奖':'jineng3',
+    '全国师范生教学技能竞赛获奖':'jineng1',
+    '省级学科竞赛一等奖':'xuekejing','省级学科竞赛二等奖':'xuekejing','省级学科竞赛三等奖':'xuekejing',
+    '高中学科奥赛省级获奖':'xuekejing','全国大学生竞赛获奖':'xuekejing',
+    '中共党员（含预备党员）':'dangyuan','优秀共产党员':'youxiudangyuan'
+  };
+  const SPECIAL_MAP = { '公费师范生':'gongfei','复硕培养':'fushuo','国优计划':'guoyou','一表或特控线':'yiduilie' };
+
+  function getProfile(){
+    const q=n=>(document.querySelector(`input[name="${n}"]:checked`)||{}).value||'';
+    const degree=q('degree');
+    // 院校类型：国内院校按校名查表；国（境）外院校直接注入对应 schoolTier token（让引擎命中国境外学历认证规则）
+    const schoolType=q('schoolType');
+    let schoolMain='', schoolMaster='', schools=[], school='', schoolTierToken='';
+    if(schoolType==='overseas_top100' || schoolType==='overseas_other'){
+      schoolTierToken = schoolType==='overseas_top100' ? '境外世界前100' : '境外其他';   // TIER_MAP 的 key；海外时 school 留空，引擎才走 schoolTier 路径
+    } else {
+      schoolMain=normalizeSchool((document.getElementById('schoolName')||{}).value);
+      schoolMaster=normalizeSchool((document.getElementById('masterSchoolName')||{}).value);
+      schools=[schoolMain, schoolMaster].filter(s=>s && s!=='不确定');
+      school=schoolMain || '';
+    }
+    const normal = q('normalMajor') || '不确定';
+    const region = q('region');
+    // 浙江省内 → 取市+区县（有 乐清/瑞安/吴兴 这类精确到区县的户籍要求）；省外 → 明确判"不符"而非"待核实"
+    const hujiProv = region==='zhejiang' ? '浙江' : (region==='other' ? '省外' : '不确定');
+    const hujiCity = region==='zhejiang' ? (document.getElementById('hukouCity').value||'') : '';
+    const hujiDistrict = region==='zhejiang' ? ((document.getElementById('hukouDistrict')||{}).value||'') : '';
+    const grad = q('graduateYear');
+    const selection = grad==='2026'?'2026届': grad==='2027'?'2026届': grad==='other'?'择业期':'不确定';
+    const rank = document.getElementById('zongce').value || '';
+    const honors=[];
+    document.querySelectorAll('#honors input:checked,#honorsScholarship input:checked,#honorsContest input:checked,#honorsAcademic input:checked,#honorsParty input:checked').forEach(c=>{ const t=HONOR_MAP[c.value]; if(t) honors.push(t); });
+    // 政治面貌＝中共党员（含预备党员）→ 具备党员身份资格；若再勾「优秀共产党员」则叠加 youxiudangyuan
+    const psVal=(document.querySelector('input[name="politicalStatus"]:checked')||{}).value||'';
+    if(psVal==='中共党员' && !honors.includes('dangyuan')) honors.push('dangyuan');
+    const special=[];
+    document.querySelectorAll('#specialStatus input:checked').forEach(c=>{ const t=SPECIAL_MAP[c.value]; if(t) special.push(t); });
+    // 教资：按学段收集（用于 record 级教资门槛核对；未勾任何教资则不约束）
+    const certStages=[], certSubjects=[];
+    document.querySelectorAll(".cert-stage-box").forEach(box=>{
+      const cks=box.querySelectorAll("input[type=checkbox]:checked");
+      if(cks.length){ certStages.push(box.dataset.stage); cks.forEach(c=>certSubjects.push(c.value)); }
+    });
+    // 精英班 / 荣誉学院身份：精确到「哪所学校的哪个班」（已级联到毕业院校）
+    // 双保险：只保留「宿主学校 == 本人本科院校」的勾选，避免脏数据蒙到资格
+    const elitePrograms=[...document.querySelectorAll('input[name="eliteProgram"]:checked')].map(c=>c.value).filter(Boolean)
+      .filter(id=>{ const h=((window.ELITE_PROGRAMS||{}).all||[]).find(x=>x.id===id); return !!(h && schoolMain===h.school); });
+    // 专业方向 / 本科专业：决定"能报哪个学科"，与教资学科合并参与学科限制判定
+    const majorVals=[];
+    const majorRad=(document.querySelector('input[name="major"]:checked')||{}).value||'';
+    if(majorRad && majorRad!=='custom') majorVals.push(majorRad);
+    const majorCustom=((document.getElementById('majorCustom')||{}).value||'').trim();
+    if(majorCustom) majorVals.push(majorCustom);
+    const bachelorMajor=((document.getElementById('bachelorMajor')||{}).value||'').trim();
+    if(bachelorMajor) majorVals.push(bachelorMajor);
+    // 普通话等级（影响语文岗：普遍要求二甲；其他学科二乙）
+    const putonghua = q('putonghua') || '';
+    // 其他条件：不参与判定，仅在结果区回显提醒（避免表单给出做不到的承诺）
+    const otherConditions = ((document.getElementById('otherConditions')||{}).value||'').trim();
+    const birthYear = ((document.getElementById('birthYear')||{}).value||'').trim();
+    return { degree, school, schools, schoolTier: schoolTierToken || school, normal, hujiProv, hujiCity, hujiDistrict, selection, rank, honors, special, certStages, certSubjects, eliteClass:elitePrograms.length>0, elitePrograms, putonghua, majors:majorVals, birthYear, otherConditions };
+  }
+
+  // ========== 匹配 ==========
+  let lastResults=[];
+  let lastProfile={};
+  let searchTerm='';
+  function runMatch(){
+    if(typeof window.matchJobs!=='function' || typeof TEACHER_DATA==='undefined'){ document.getElementById('resultArea').innerHTML='<div class="empty-tip">数据加载中…</div>'; return; }
+    lastProfile=getProfile();
+    lastResults = window.matchJobs(lastProfile, TEACHER_DATA) || [];
+    showNoSubject=false;
+    renderResults();
+  }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function statusText(s){ return {ok:'可报',maybe:'待核实',no:'不可报'}[s]||s; }
+
+  // ---- 卡片信息精简辅助（标题=市+县，内容只留关键事实，杜绝重复词条与大段文字）----
+  // 批次名拆成「县区」+「招聘内容」：如 杭州 / 余杭区 / 2026年第一批公开招聘中小学事业编制教师
+  // 取批次名开头最具体的末级行政区划：浙江省湖州市吴兴区 → 吴兴区；丽水市教育局 → 丽水市（后接单位名时由调用方置空）
+  function leadingArea(b){
+    const s=b.replace(/^浙江省/,'');
+    const m=s.match(/^([\u4e00-\u9fa5]{2,4}市)?([\u4e00-\u9fa5]*?(?:自治县|自治州|新区|开发区|区|县|镇|街道))(?![一-龥])/);
+    if(m) return m[2];
+    const m2=s.match(/^([\u4e00-\u9fa5]{2,6}(?:区|县|市|镇|街道))/);
+    return m2 ? m2[1] : '';
+  }
+  function splitRegion(rec){
+    const city=rec.city||''; let b=String(rec.batch||'');
+    let area=rec.district||'';
+    if(!area){
+      area=leadingArea(b);
+      // 若 area 仅是「XX市」且 batch 后接单位名（丽水市教育局），不作为县区，避免「湖州·浙江省湖州市」这类冗余
+      if(/^[\u4e00-\u9fa5]{2,6}市$/.test(area)){
+        const rest=b.slice(b.indexOf(area)>=0?b.indexOf(area)+area.length:0);
+        if(/(中学|小学|学院|大学|学校|研究院|教育局|附属|校区|集团|分校|实验)/.test(rest)) area='';
+      }
+    }
+    let desc=b;
+    if(area && desc.startsWith(area)) desc=desc.slice(area.length);
+    if(city && desc.startsWith(city)) desc=desc.slice(city.length);
+    desc=desc.replace(/^[\s·、，,（(【\-—的]+/,'').replace(/（几个公告合并）/g,'').trim();
+    return { area, desc: desc };
+  }
+  // 招聘内容标题：批次名去掉市区前缀后的剩余。
+  // 若剩余只是「地名/单位名」（不含招聘类关键词），补成「招聘什么什么」，
+  // 既符合「市+县 + 招聘什么什么」的标题结构，也避免与事实行里的地名撞车变成重复词条。
+  function briefRecruit(rec){
+    const region = splitRegion(rec);
+    let d = (region.desc||'').replace(/\s+/g,'');
+    const placeWords = rec.city + (region.area||'');
+    const isPurePlace = !d || d===region.area || d===rec.city || d===placeWords
+      || /^[一-龥]{2,10}(?:自治县|自治州|新区|开发区|区|县|市|镇|街道)$/.test(d);
+    // 单位/学校名（中学、小学、大学、学院、学校、研究院、教育局、附属、校区、集团、分校、实验）
+    const unitKW = /中学|小学|学院|大学|学校|研究院|教育局|附属|校区|集团|分校|实验/;
+    const du = d.replace(/^浙江省/,'').replace(/^[\u4e00-\u9fa5]{2,4}市/,'');   // 去省/市前缀再判单位
+    const isUnit = du.length<=18 && unitKW.test(du);
+    if(isUnit && !/(招聘|教师|校招|引进|人才|公开|选聘|面向|毕业生|高层次)/.test(d)){
+      let name = du;
+      if(name.endsWith('教育局')){
+        const loc = (region.area && region.area!==rec.city) ? region.area : rec.city;   // 德清县教育局 / 湖州市教育局
+        name = loc + '教育局';
+      }
+      return name + '教师招聘';
+    }
+    if(isPurePlace){
+      // 纯地名批次：用「县区 + 编制类型」组成具体事件名，避免「事业编教师招聘」这类空标题
+      const st=(rec.staffingType||'').replace(/（[^）]*）/g,'').replace('事业编制','事业编')||'事业编';
+      const loc=region.area || rec.city;
+      return loc + st + '教师招聘';
+    }
+    return d;
+  }
+  // 卡片标题：市 · 批次名（一行说清「考哪里 + 哪个批次」）。
+  // 批次名直接用考情表原文，不再加工；只去掉与市名重复的开头（如「温州市教育局…」→「教育局…」）。
+  function cardTitle(rec){
+    const city=rec.city||'';
+    let b=String(rec.batch||'').replace(/（几个公告合并）/g,'').replace(/^浙江省/,'').replace(/\s+/g,' ').trim();
+    if(city){
+      if(b.indexOf(city+'市')===0) b=b.slice((city+'市').length);
+      else if(b.indexOf(city)===0) b=b.slice(city.length);
+      b=b.replace(/^[·、，,\-—\s]+/,'');
+    }
+    return (city?city+' · ':'')+(b||rec.batch||'');
+  }
+  // 本人「可报考学科」：教资学科 ∪ 专业方向 ∪ 本科专业（与引擎 subjectsOfProfile 保持一致）
+  function mySubjectWords(){
+    if(typeof window.subjectsOfProfile==='function'){ try{ return window.subjectsOfProfile(lastProfile)||[]; }catch(e){} }
+    const out=[];
+    (lastProfile.certSubjects||[]).forEach(s=>{ const t=String(s).replace(/^(幼儿园|小学|初中|高中|中职)/,''); if(t&&!out.includes(t)) out.push(t); });
+    return out;
+  }
+  // 去掉长括号说明，保留括号前后的关键内容：
+  //   「小学数学约12人（未来科技城小学3/…等）、初中数学8人」→「小学数学约12人、初中数学8人」
+  //   「60名（本科及以上，专业含数学类0701、小学教育(数学)）」→「60名」（含嵌套括号）
+  // 短括号（≤11字，如「（无小学）」「（硕士及以上）」）保留：它往往就是关键信息
+  function trimParen(s){
+    let t=String(s).trim();
+    t=t.replace(/[（(][^（()）]{0,40}[（(][^）)]*[）)][^）)]*[）)]/g,'');   // 含一层嵌套的
+    t=t.replace(/[（(][^）)]{12,}[）)]/g,'');                            // 普通长括号
+    const open=(t.match(/[（(]/g)||[]).length, close=(t.match(/[）)]/g)||[]).length;
+    if(close>open) t=t.replace(/[）)]+\s*$/,'');                        // 只清掉截断后遗留的半个括号
+    return t.replace(/[，,、；;]\s*$/,'').replace(/\s{2,}/g,' ').trim();
+  }
+  function briefCount(rec){
+    const t=(rec.timeline||{}).count; if(t) return String(t).replace(/\s+/g,'');
+    const pd=String(rec.postsDetail||'');
+    const m=pd.match(/共\s*(\d+\s*[名人])/) || pd.match(/^(\d+\s*[名人])/);
+    return m ? m[1].replace(/\s+/g,'') : '';
+  }
+  // 岗位明细：优先截取「本人学科」相关的那一两句，去掉与「招聘人数」重复的总人数句、去掉分校明细
+  function briefPosts(rec){
+    const pd=String(rec.postsDetail||'').trim(); if(!pd) return '';
+    const subs=mySubjectWords();
+    let segs=pd.split(/[；;。\n]+/).map(s=>s.trim()).filter(Boolean);
+    // 首句常是「共564名」这类总数，已在「👥 招聘」里展示 → 去掉，避免重复词条
+    const kept=segs.filter((s,i)=>!(i===0 && /^[^：:]{0,8}(共)?\s*\d+\s*[名人]/.test(s) && !subs.some(x=>s.includes(x))));
+    if(kept.length) segs=kept;      // 只有这一段时保留，避免整行空白
+    let want = subs.length ? segs.filter(s=>subs.some(x=>s.includes(x))) : [];
+    if(!want.length) want=segs.slice(0,2);
+    // 逐句清理后再拼接：一次清整串会在第一个长括号处把后面的内容全砍掉
+    let txt=want.slice(0,3).map(trimParen).filter(Boolean).join('；');
+    txt=txt.replace(/[，,、；;]\s*$/,'').trim();
+    return txt.length>52 ? txt.slice(0,52)+'…' : txt;
+  }
+  // 考核内容精简版：只留「笔试/面试 + 具体形式 + 分值比例」重点，完整原文进弹窗
+  function briefExam(rec){
+    const s=String((rec.timeline||{}).examForm||'').trim(); if(!s) return '';
+    // 分值比例：「笔试占40%」「面试60%」或「4:6」
+    const parts=[];
+    s.replace(/(笔试|面试|试讲|说课|技能测试|综合素养)[^0-9%]{0,6}?(\d{1,2})\s*%/g,(m,k,v)=>{parts.push(k+v+'%');return m;});
+    let ratio='';
+    if(parts.length===2) ratio='（'+parts.join('·')+'）';
+    else if(parts.length===1) ratio='（'+parts[0]+'）';
+    else { const m=s.match(/(?<!\d)(\d)\s*[:：]\s*(\d)(?!\d)/);   // 排除「16:00」这类时间；仅认 4:6/5:5 这类十进制分值比
+      if(m && Number(m[1])+Number(m[2])===10) ratio='（'+m[1]+'∶'+m[2]+'）'; }
+    // 具体形式关键词（长词先匹配，避免「结构化面试」被拆成两条）
+    const work=s, inner=[];
+    ['片段教学','模拟上课','技能测试','综合素养','结构化','试讲','说课','面谈','答辩','微课'].forEach(f=>{
+      if(work.includes(f) && !inner.some(x=>x.includes(f))){ inner.push(f); }
+    });
+    const hasWritten=/笔试/.test(s);
+    const hasInterview=/面试|试讲|说课|模拟上课|面谈|答辩|技能测试/.test(s);
+    let main='';
+    if(hasWritten && inner.length) main='笔试＋面试（'+inner.join('＋')+'）';
+    else if(hasWritten && hasInterview) main='笔试＋面试';
+    else if(hasWritten) main='笔试';
+    else if(inner.length) main='面试（'+inner.join('＋')+'）';
+    else if(hasInterview) main='面试';
+    else return '';
+    let t=main+ratio;
+    return t.length>34 ? t.slice(0,34)+'…' : t;
+  }
+  // 考核时间：从考核说明里抽出「笔试/面试 + 具体时间」；跳过报名/确认/查询等流程节点
+  function briefExamTime(rec){
+    const s=String((rec.timeline||{}).examForm||''); if(!s) return '';
+    const out=[];   // [{kw, val}]
+    s.split(/[。；;\n]/).forEach(seg=>{
+      if(!/(笔试|面试|考核|考试)/.test(seg)) return;
+      if(/(报名|查询|确认|初审|改报|公示|公布|成绩)/.test(seg)) return;   // 流程节点不是考核时间
+      // 先认「X月+旬/初」（信息更准），再退回「X月X日」
+      const t=seg.match(/(\d{4}年)?\d{1,2}月(?:上旬|中旬|下旬|初)/) || seg.match(/(\d{4}年)?\d{1,2}月(?:\d{1,2}日)?/);
+      if(!t) return;
+      const kw=/笔试/.test(seg)?'笔试':(/面试/.test(seg)?'面试':'考核');
+      if(!out.some(x=>x.kw===kw && x.val===t[0])) out.push({kw:kw, val:t[0]});
+    });
+    // 同一考核环节的多个时间合并成「12月下旬或2026年1月初」
+    const merged=[];
+    out.forEach(x=>{ const last=merged[merged.length-1];
+      if(last && last.kw===x.kw) last.vals.push(x.val); else merged.push({kw:x.kw, vals:[x.val]}); });
+    return merged.slice(0,2).map(m=>m.kw+' '+m.vals.join('或')).join('；');
+  }
+  function briefDeadline(rec){
+    let s=String((rec.timeline||{}).deadline||'').trim(); if(!s) return '';
+    s=s.replace(/\s+/g,'');
+    const i=s.indexOf('截止');                 // 只保留到「截止」为止，后面的查询/改报说明不占位置
+    if(i>0 && i<=16) s=s.slice(0,i+2);
+    return s.length>22 ? s.slice(0,22)+'…' : s;
+  }
+  // 匹配原因：卡片只给精简版，完整原文放到点击后的详情弹窗
+  function briefReason(j){
+    let s;
+    if(j.status==='ok') s=j.passDetail||'满足报考条件';
+    else if(j.status==='maybe') s=(j.unknownReasons||[]).join('；')||'需确认';
+    else s=(j.reasons||[]).join('；')||'不满足报考条件';
+    s=String(s).replace(/\s+/g,' ').replace(/\n+/g,' ').trim();
+    // 可报：原文常是「门槛+豁免句+补充说明」的长句 → 只取最前面的主干，完整版看弹窗
+    if(j.status==='ok'){
+      const cut=s.search(/[（(]/);
+      if(cut>=10) s=s.slice(0,cut);
+    }
+    return s.length>40 ? s.slice(0,40)+'…' : s;
+  }
+
+  // 公告时间：publishTime 为「月日」格式，按 2026 届招聘周期推年份（9-12月→2025年，1-8月→2026年）
+  function pubTs(j){
+    const s=j&&j.timeline&&String(j.timeline.publishTime||'').trim();
+    const m=s&&s.match(/(\d{1,2})月\s*(\d{1,2})日?/);
+    if(!m) return 0;
+    const mo=+m[1], d=+m[2];
+    return (mo>=9?2025:2026)*10000+mo*100+d;
+  }
+  function pubTxt(j){
+    const s=j&&j.timeline&&String(j.timeline.publishTime||'').trim();
+    if(!s) return '';
+    const m=s.match(/(\d{1,2})月\s*(\d{1,2})日?/);
+    if(!m) return '公告 '+s;
+    const mo=+m[1], d=+m[2];
+    return '公告 '+((mo>=9)?'2025':'2026')+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  }
+  function jobCardHTML(j){
+    const greyCls = j._focusGrey ? ' focusgrey' : '';
+    const needBadge = j._focusGrey ? `<span class="badge-needcert" title="你当前勾选的教资证无法覆盖${esc(j._focusNeed)}学段，需持有${esc(j._focusNeed)}教师资格证书才可报考该学段岗位">需${esc(j._focusNeed)}教资</span>` : '';
+    const titleTxt = cardTitle(j);
+    const profileHasSubj = !!(lastProfile.certSubjects && lastProfile.certSubjects.length);
+    const badges = (j.openEligible?'<span class="badge-bianzhi">公告无门槛</span>':'') + (j.referencedFrom?'<span class="badge-year">参考首批</span>':'') + (j.conditionUnknown?'<span class="badge-conf conf-warn">条件待核实</span>':'') + (j.subjectFit==='no'?'<span class="badge-nosubj badge-nomatch">本批无对口学科岗</span>':'') + ((j.subjectFit==='unknown'&&j.status!=='no'&&profileHasSubj)?'<span class="badge-nosubj" title="本批次岗位表未列出具体学科清单（学科要求写在原公告的岗位表附件里、本工具未收录），无法自动判断你是否有对口岗。请点开卡片、对照原公告岗位表核对专业与教资学科要求。">学科未收录·查岗位表</span>':'');
+    const reasonCls = j.status==='ok'?'job-hit': j.status==='maybe'?'job-tip':'job-reason';
+    const icon = j.status==='ok'?'✓ ': j.status==='maybe'?'⚠ ':'✕ ';
+    // 学段 / 学科标签
+    const stageTags=(j.stages||[]).map(s=>`<span class="tag-stage">${esc(s)}</span>`).join('');
+    const mathYes=Object.keys(j.mathStage||{}).filter(k=>j.mathStage[k]==='yes');
+    const mathMaybe=Object.keys(j.mathStage||{}).filter(k=>j.mathStage[k]==='conflict');
+    let subjTags='';
+    if(mathYes.length) subjTags+=`<span class="tag-subject">数学岗 ${esc(mathYes.join('/'))}</span>`;
+    if(!mathYes.length && mathMaybe.length) subjTags+=`<span class="tag-subject">数学岗待核 ${esc(mathMaybe.join('/'))}</span>`;
+    const pubTag=pubTs(j)?`<span class="tag-stage">📢 ${pubTxt(j)}</span>`:'';
+    // 关键事实：岗位 + 考核（形式精简＋考核时间并入一行），招聘总人数/报名截止不再重复展示
+    const facts=[];
+    const posts=briefPosts(j); if(posts) facts.push(`<div class="job-fact"><span class="k">📚 岗位</span><span class="v">${esc(posts)}</span></div>`);
+    const exam=briefExam(j); const et=briefExamTime(j);
+    const examTxt=[exam, et].filter(Boolean).join(' · ');
+    if(examTxt) facts.push(`<div class="job-fact exam"><span class="k">📝 考核</span><span class="v">${esc(examTxt)}</span></div>`);
+    // 原公告跳转：精确匹配到的批次跳原公告，其余跳汇总总文章（兜底）
+    const _lk = window.LINK_DATA || {};
+    const _exact = _lk.map && _lk.map[j.id];
+    const _src = _exact || _lk.summaryUrl || '';
+    const srcBtn = _src ? `<a class="job-src${_exact?'':' fallback'}" href="${_src.replace(/"/g,'%22')}" target="_blank" rel="noopener" onclick="event.stopPropagation()">查看原公告 ↗</a>` : '';
+    return `<div class="job-card ${j.status}${greyCls}" data-id="${j.id}" onclick="openDetail('${j.id}')">
+      <span class="job-status">${statusText(j.status)}</span>
+      <div class="job-title">${esc(titleTxt)}</div>
+      <div class="job-info">${esc(j.staffingType||'')}${stageTags}${needBadge}${subjTags}${pubTag}</div>
+      ${facts.length?('<div class="job-facts">'+facts.join('')+'</div>'):''}
+      <div class="${reasonCls}">${icon}${esc(briefReason(j))}</div>
+      <div class="job-foot">${badges}${srcBtn}</div>
+      <div class="fav-btn ${isFav(j.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${j.id}')"><span class="star">${isFav(j.id)?'★':'☆'}</span></div>
+    </div>`;
+  }
+
+
+  let activeFilter='all';
+  function setFilter(f){ activeFilter=f||'all'; renderResults(); }
+  document.getElementById('statusFilter').addEventListener('change', function(){ setFilter(this.value); });
+  document.getElementById('cityFilter').addEventListener('change', renderResults);
+  document.getElementById('bianzhiOnly').addEventListener('change', renderResults);
+  document.getElementById('resultSearch').addEventListener('input', function(){ searchTerm=(this.value||'').trim(); renderResults(); });
+
+  // 报考学段聚焦：仅作「展示聚焦」，教资证仍掌管有效性（matchJobs 已按 certLevel 判定）
+  let focusStage='';
+  function coveredOf(stages){
+    if((stages||[]).includes('高中')) return ['高中','初中','小学'];
+    if((stages||[]).includes('初中')) return ['初中','小学'];
+    if((stages||[]).includes('小学')) return ['小学'];
+    if((stages||[]).includes('幼儿园')) return ['幼儿园'];
+    return [];
+  }
+  // 用户教资证的"最高学段"（用于大白话解释灰色原因）
+  function certTopOf(stages){
+    if((stages||[]).includes('高中')) return '高中';
+    if((stages||[]).includes('初中')) return '初中';
+    if((stages||[]).includes('小学')) return '小学';
+    if((stages||[]).includes('幼儿园')) return '幼儿园';
+    return '';
+  }
+  function setFocus(stage){
+    focusStage = (focusStage===stage) ? '' : stage;   // 再点同一段＝取消聚焦
+    document.querySelectorAll('#focusSeg button').forEach(b=>{
+      const on = b.dataset.stage===focusStage;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    renderResults();
+  }
+  document.querySelectorAll('#focusSeg button').forEach(b=>{ b.addEventListener('click', ()=> setFocus(b.dataset.stage)); });
+
+  let showNoSubject=false;   // 是否展开「本批无对口学科岗位」的批次
+  function toggleNoSubject(){ showNoSubject=!showNoSubject; renderResults(); }
+
+  function renderResults(){
+    const bz=document.getElementById('bianzhiOnly').checked;
+    const cf=document.getElementById('cityFilter').value;
+    const st=(searchTerm||'').trim();
+    // 报考学科由本人专业／教资学科决定 → 引擎已自动判定，无需手动筛学科
+    // 先按「编制/城市/搜索」筛出上下文集合 → 统计数字随筛选实时变化；状态筛选只在集合内部再收窄
+    let noSubjN=0, unknownN=0;
+    const ctxList=lastResults.filter(j=>{
+      if(bz && !/事业编|备案|员额/.test(j.staffingType||'')) return false;
+      if(cf && j.city!==cf) return false;
+      if(st){ const hay=(j.city+j.batch+(j.district||'')).toLowerCase(); if(!hay.includes(st.toLowerCase())) return false; }
+      // 报考学段聚焦：只展示招该学段的批次（不招该学段的整批隐藏，做「聚焦」而非虚高）
+      if(focusStage && !(j.stages||[]).includes(focusStage)) return false;
+      return true;
+    });
+    // 聚焦后：用户教资覆盖不到该学段 → 灰显并标「需X教资」（仍在列表里、计入统计，告知用户还差哪本证）
+    const myCover=coveredOf(lastProfile.certStages);
+    ctxList.forEach(j=>{
+      j._focusGrey=false; j._focusNeed='';
+      if(focusStage && !myCover.includes(focusStage)){ j._focusGrey=true; j._focusNeed=focusStage; }
+    });
+    // 聚焦状态提示条：大白话解释灰色卡片的原因
+    (function(){
+      const fh=document.getElementById('focusHint');
+      if(!fh) return;
+      if(!focusStage){ fh.style.display='none'; fh.innerHTML=''; return; }
+      const greyN=ctxList.filter(j=>j._focusGrey).length;
+      const subs=[...new Set((lastProfile.certSubjects||[]).map(s=>String(s).replace(/^(幼儿园|小学|初中|高中|中职)/,'')))];
+      const mine=subs.length?subs.join('、'):'';
+      const top=certTopOf(lastProfile.certStages);
+      let msg;
+      if(!(lastProfile.certStages||[]).length){
+        msg='🔘 灰色批次＝这些批次招'+esc(focusStage)+'岗位，但你还没勾选教师资格证，系统没法判断你能不能报。';
+      } else if(greyN>0){
+        msg='🔘 灰色批次说明：这些批次有<b>'+esc(focusStage)+'</b>岗位，但你的教资证'+(mine?('（'+esc(mine)+'）'):'')+'最高只能教'+esc(top)+'，报'+esc(focusStage)+'岗要先考到'+esc(focusStage)+'教师资格证。'+esc(top)+'及以下学段的岗位不受影响，正常显示。';
+      } else {
+        msg='✅ 已聚焦'+esc(focusStage)+'：下面的批次都招'+esc(focusStage)+'岗位，你的教资证都能覆盖到。';
+      }
+      fh.innerHTML=msg; fh.style.display='block';
+    })();
+    // 学科自动对口：本批明确无我的教资学科岗位 → 默认不显示（可一键展开）
+    const baseList=ctxList.filter(j=>{
+      if(j.subjectFit==='unknown') unknownN++;
+      if(j.subjectFit==='no'){ noSubjN++; if(!showNoSubject) return false; }
+      return true;
+    });
+    // 学科自动匹配提示
+    const hintEl=document.getElementById('stageHint');
+    if(hintEl){
+      const subs=[...new Set((lastProfile.certSubjects||[]).map(s=>String(s).replace(/^(幼儿园|小学|初中|高中|中职)/,'')))];
+      const link='<span style="color:#2563EB;cursor:pointer;text-decoration:underline;" onclick="toggleNoSubject()">';
+      if(!subs.length){
+        hintEl.innerHTML='<span style="color:#E5820E;">⚠ 你还没勾选教师资格证的学段与学科，因此下方「学科对口」无法判断、已隐藏「学科未收录·查岗位表」提示。勾选后系统会自动按你的学科匹配岗位，统计也会随之更新。</span>';
+      } else {
+        const yang=esc(subs.join('/'));
+        const core='已按你的教资学科（'+yang+'）自动匹配岗位';
+        const unk=unknownN?('<br><span style="color:#9AA3AE;">另有 '+unknownN+' 条未收录岗位明细，是否有'+yang+'岗请查原公告核对</span>'):'';
+        if(noSubjN && !showNoSubject){
+          hintEl.innerHTML=core+'，已隐藏 '+noSubjN+' 条无'+yang+'岗批次　'+link+'显示全部</span>'+unk;
+        } else if(showNoSubject){
+          hintEl.innerHTML=core+'，已显示全部批次（含 '+noSubjN+' 条无'+yang+'岗的）　'+link+'收起</span>'+unk;
+        } else {
+          hintEl.innerHTML=core+unk;
+        }
+      }
+    }
+    const list = activeFilter==='all' ? baseList : baseList.filter(j=>j.status===activeFilter);
+    const okN=baseList.filter(j=>j.status==='ok').length;
+    const maybeN=baseList.filter(j=>j.status==='maybe').length;
+    const noN=baseList.filter(j=>j.status==='no').length;
+    let html='';
+    html+=`<div class="summary-bar">
+      <div class="summary-item ok ${activeFilter==='ok'?'active':''}" onclick="setFilter('ok')"><div class="n">${okN}</div><div class="t">可报</div></div>
+      <div class="summary-item maybe ${activeFilter==='maybe'?'active':''}" onclick="setFilter('maybe')"><div class="n">${maybeN}</div><div class="t">待核实</div></div>
+      <div class="summary-item no ${activeFilter==='no'?'active':''}" onclick="setFilter('no')"><div class="n">${noN}</div><div class="t">不可报</div></div>
+    </div>`;
+    // 「当前聚焦」小胶囊：列表长时往下翻也能看到聚焦状态，✕ 一键取消
+    if(focusStage){
+      html+=`<div><span class="focus-chip">🎯 已聚焦：${esc(focusStage)}<b style="margin:0 4px;font-weight:700;">· 共 ${ctxList.length} 批</b><span class="x" title="取消聚焦" onclick="setFocus('')">✕</span></span></div>`;
+    }
+    if((lastProfile.otherConditions||'').trim()){
+      html+=`<div class="disclaimer" style="margin:8px 0 4px;">📝 你自己补充的条件：<b>${esc(lastProfile.otherConditions.trim())}</b>　—— 该内容不参与自动匹配，请对照各批次公告原文核对。</div>`;
+    }
+    if(!list.length){ html+='<div class="empty-tip">没有匹配的批次，试试放宽筛选条件</div>'; }
+    else {
+      const groups={};
+      list.forEach(j=>{ (groups[j.city]=groups[j.city]||[]).push(j); });
+      Object.keys(groups).sort((a,b)=>a.localeCompare(b,'zh')).forEach(city=>{
+        html+=`<div class="sub-group-title"><span class="dot real"></span>${esc(city)}（${groups[city].length}）</div>`;
+        // 组内按公告发布时间升序（从早到晚，用户要求"按时间顺序"），无公告时间的排最后
+        groups[city].sort((a,b)=>pubTs(a)-pubTs(b));
+        html+=groups[city].map(jobCardHTML).join('');
+      });
+    }
+    document.getElementById('resultArea').innerHTML=html;
+  }
+
+  // ========== 详情弹窗 ==========
+  function openDetail(id){
+    const rec=TEACHER_DATA.records.find(r=>String(r.id)===String(id));
+    const res=lastResults.find(r=>String(r.id)===String(id));
+    if(!rec) return;
+    document.getElementById('modalLocation').textContent=[rec.city,rec.batch,rec.district].filter(Boolean).join(' · ');
+    document.getElementById('modalStaffing').textContent=rec.staffingType||'—';
+    // 毕业院校要求：优先显示「命中路径」；未命中则汇总本批全部路径，方便对照为什么不可报
+    (function(){
+      const row=document.getElementById('modalSchoolRow');
+      if(!row) return;
+      const allRules=(rec.eligibilityRules&&rec.eligibilityRules.rules)||[];
+      const hit=(res&&res.hitRuleId!=null)?allRules.find(x=>String(x.ruleId)===String(res.hitRuleId)):null;
+      const src=hit?[hit]:allRules;
+      const names=[...new Set(src.reduce((a,x)=>a.concat(x.schoolNames||[]),[]))];
+      const tiers=[...new Set(src.reduce((a,x)=>a.concat(x.schoolTier||[]),[]))];
+      const unk=src.some(x=>x.tierUnknown);
+      const LABEL={'985A类':'985高校','一流学科':'一流学科建设高校','双一流':'双一流建设高校','国内部分高校':'国内部分高校（=双一流名单）','国境外世界前100':'国（境）外世界排名前100','国境外其他':'国（境）外高校','浙15所':'浙江省重点建设高校（15所）','部属师范6所':'教育部直属师范大学（6所）'};
+      const parts=[];
+      let tierLabels=tiers.map(t=>LABEL[t]||t);
+      // 「双一流」与「国内部分高校」是同一份名单 → 展示时只留带说明的那个
+      if(tiers.includes('双一流')&&tiers.includes('国内部分高校')) tierLabels=tierLabels.filter(x=>x!=='双一流建设高校');
+      if(names.length) parts.push('<div style="margin:3px 0;line-height:1.65;"><span style="color:var(--ink-sub);">'+((hit?'点名院校：':'本批点名院校（任一）：'))+'</span><b>'+esc(names.join('、'))+'</b></div>');
+      if(tierLabels.length) parts.push('<div style="margin:3px 0;line-height:1.65;"><span style="color:var(--ink-sub);">院校层次：</span>'+esc(tierLabels.join(' 或 '))+'</div>');
+      if(unk) parts.push('<div style="margin:3px 0;line-height:1.65;color:#B45309;">⚠ 本批还含无法枚举的院校表述，需查原公告核对。</div>');
+      if(parts.length){ row.style.display=''; document.getElementById('modalSchool').innerHTML=parts.join(''); }
+      else row.style.display='none';
+    })();
+    // 招聘 / 考核信息（timeline 字段：公告发布 / 报名截止 / 招聘人数 / 考核时间 / 考核形式）
+    const tl=rec.timeline||{};
+    const tlRow=document.getElementById('modalTimelineRow');
+    const tlItems=[];
+    if(tl.publishTime) tlItems.push(['公告发布', tl.publishTime]);
+    if(tl.deadline) tlItems.push(['报名截止', tl.deadline]);
+    if(tl.count) tlItems.push(['招聘人数', tl.count]);
+    const examTime=briefExamTime(rec); if(examTime) tlItems.push(['考核时间', examTime]);
+    const examGist=briefExam(rec);     if(examGist) tlItems.push(['考核形式', examGist]);
+    let tlHtml = tlItems.map(it=>
+      '<div style="margin:3px 0;line-height:1.65;"><span style="color:var(--ink-sub);">'+it[0]+'：</span>'+esc(it[1])+'</div>'
+    ).join('');
+    // 原文常是一大段流程说明 → 默认折起，需要时展开
+    if(tl.examForm && String(tl.examForm).replace(/\s/g,'').length > String(examGist||'').replace(/[\s…]/g,'').length + 6){
+      tlHtml += '<details><summary>展开完整考核说明</summary><div>'+esc(tl.examForm).replace(/\n/g,'<br>')+'</div></details>';
+    }
+    if(tlHtml){ tlRow.style.display=''; document.getElementById('modalTimeline').innerHTML=tlHtml; }
+    else { tlRow.style.display='none'; }
+    // 招聘学段 / 学科（无内容整行隐藏，避免出现"学段：未收录"这类空行）
+    const ms=rec.mathStage||{};
+    const mathYes=Object.keys(ms).filter(k=>ms[k]==='yes');
+    const mathMaybe=Object.keys(ms).filter(k=>ms[k]==='conflict');
+    const mathNo=Object.keys(ms).filter(k=>ms[k]==='no');
+    const ssLines=[];
+    if(rec.stages&&rec.stages.length) ssLines.push('学段：'+rec.stages.join('、'));
+    if(mathYes.length) ssLines.push('数学岗：'+mathYes.join('、'));
+    if(mathMaybe.length) ssLines.push('数学岗（正反表述并存，需核实）：'+mathMaybe.join('、'));
+    if(mathNo.length) ssLines.push('明确无数学岗：'+mathNo.join('、'));
+    if(rec.subjects&&rec.subjects.length) ssLines.push('本批涉及学科：'+rec.subjects.join('、'));
+    const CERT_CN={any:'不限（或未明确要求）',none:'不限',primary:'小学教师资格',junior:'初中教师资格',senior:'高中教师资格',unknown:'未明确'};
+    if(rec.certLevel) ssLines.push('教师资格要求：'+(CERT_CN[rec.certLevel]||rec.certLevel));
+    const ssRow=document.getElementById('modalStageSubjectRow');
+    if(ssLines.length){
+      ssRow.style.display='';
+      document.getElementById('modalStageSubject').innerHTML=esc(ssLines.join('\n')).replace(/\n/g,'<br>');
+    } else { ssRow.style.display='none'; }
+    // 学科对口（按本人教资学科自动判定）
+    const sfRow=document.getElementById('modalSubjectFitRow');
+    const mySubs=[...new Set((lastProfile.certSubjects||[]).map(s=>String(s).replace(/^(幼儿园|小学|初中|高中|中职)/,'')))];
+    if(sfRow){
+      if(!mySubs.length || res.subjectFit==='yes'){
+        sfRow.style.display='none';
+      } else {
+        sfRow.style.display='';
+        document.getElementById('modalSubjectFit').innerHTML = res.subjectFit==='no'
+          ? '<span style="color:var(--maybe);font-weight:600;">⚠ 本批未设「'+esc(mySubs.join('/'))+'」岗位</span><div style="margin-top:4px;color:var(--ink-sub);font-size:13px;">报考学科由你的专业／教师资格证学科决定，本批岗位表中没有对口学科岗位，一般无需报考。</div>'
+          : '<span style="color:var(--maybe);font-weight:600;">⚠ 本批学科清单未收录</span><div style="margin-top:4px;color:var(--ink-sub);font-size:13px;">学科要求写在原公告的岗位表附件里，本工具未收录具体学科清单，是否含「'+esc(mySubs.join('/'))+'」岗无法自动判断。请点「查看原公告」对照岗位表，逐条核对专业与教资学科要求。</div>';
+      }
+    }
+    // 岗位明细原文
+    document.getElementById('modalPosts').innerHTML = rec.postsDetail
+      ? esc(rec.postsDetail).replace(/\n/g,'<br>')
+      : '该批次未收录岗位明细，请查阅原公告岗位表';
+    // 专业要求（未结构化，仅作提示）
+    const mrow=document.getElementById('modalMajorRow');
+    if(rec.majorRequired){
+      mrow.style.display='';
+      document.getElementById('modalMajor').innerHTML =
+        '<span style="color:var(--maybe);font-weight:600;">⚠ 本批次要求报考专业与岗位学科对口</span>'+
+        '<div style="margin-top:4px;color:var(--ink-sub);font-size:13px;">本工具未收录「岗位—专业对照表」，具体以原公告岗位表所列专业名称为准（如"数学与应用数学""小学教育"等）。</div>';
+    } else {
+      mrow.style.display='none';
+    }
+    const stEl=document.getElementById('modalStatus');
+    stEl.textContent=statusText(res.status);
+    stEl.className='modal-status-chip '+(res.status||'');
+    let reason='';
+    if(res.status==='ok') reason=res.passDetail||'满足报考条件';
+    else if(res.status==='maybe') reason=(res.unknownReasons||[]).join('\n')||'需确认';
+    else reason=(res.reasons||[]).join('\n')||'不满足报考条件';
+    document.getElementById('modalReason').innerHTML=esc(reason).replace(/\n/g,'<br>');
+    // 报考条件（合并学历 / 应届身份 / 其他条件三段，长文默认折起）
+    const condParts=[];
+    if(rec.rawEdu) condParts.push('【学历 / 学位】'+rec.rawEdu);
+    if(rec.rawSelection) condParts.push('【应届 / 择业期】'+rec.rawSelection);
+    if(rec.rawOther) condParts.push('【其他条件】'+rec.rawOther);
+    document.getElementById('modalCondition').innerHTML = condParts.length
+      ? '<details><summary>展开查看报考条件原文（共 '+condParts.length+' 段）</summary><div>'+esc(condParts.join('\n')).replace(/\n/g,'<br>')+'</div></details>'
+      : '<span style="color:var(--ink-sub);">本批未单列文字条件，以原公告为准。</span>';
+    // 备注 / 其他说明
+    const notes=[rec.rawNotes, rec.sourceNote].filter(Boolean);
+    const nRow=document.getElementById('modalNotesRow');
+    if(notes.length){
+      nRow.style.display='';
+      document.getElementById('modalNotes').innerHTML=esc(notes.join('\n')).replace(/\n/g,'<br>');
+    } else {
+      nRow.style.display='none';
+    }
+    document.getElementById('modalYuan').innerHTML=(rec.conditionUnknown?'<div style="color:var(--maybe);margin-bottom:4px;">⚠ 该批次报考条件原文未明确，建议查阅原公告。</div>':'')+'报考条件整理自各地官方招聘公告，具体以原公告为准。更多考情解读与报考指导，请关注微信公众号<b>「浙江师元教师考试」</b>。';
+    document.getElementById('detailModal').classList.add('show');
+  }
+  function closeModal(){ document.getElementById('detailModal').classList.remove('show'); }
+
+  // ========== 收藏 ==========
+  const FAV_KEY='zj_early_favs';
+  function getFavs(){ try{ return JSON.parse(localStorage.getItem(FAV_KEY)||'[]'); }catch(e){ return []; } }
+  function isFav(id){ return getFavs().some(f=>f.id===id); }
+  function toggleFav(id){
+    const res=lastResults.find(r=>String(r.id)===String(id)); if(!res) return;
+    let favs=getFavs();
+    if(favs.some(f=>f.id===id)) favs=favs.filter(f=>f.id!==id);
+    else favs.push({id, city:res.city, batch:res.batch, district:res.district, staffingType:res.staffingType, status:res.status});
+    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+    renderResults();
+    renderFavList(); // 实时刷新浮动按钮角标
+  }
+
+  // ========== 时间线弹窗（改为收藏清单） ==========
+  function openTimelineModal(){
+    const t=document.querySelector('#timelineModal .timeline-title'); if(t) t.textContent='我的收藏';
+    renderFavList();
+    document.getElementById('timelineModal').classList.add('show');
+  }
+  function closeTimelineModal(){ document.getElementById('timelineModal').classList.remove('show'); }
+  // ---- 收藏 × 数据库关联：按 id 取最新记录（报考时间等），不依赖收藏时的快照 ----
+  function favRec(id){
+    if(typeof TEACHER_DATA==='undefined') return null;
+    return TEACHER_DATA.records.find(r=>String(r.id)===String(id)) || null;
+  }
+  // 报名截止 → 取截止文案里最后一个「X月X日」（网报截止日），两位年缩写「26年」/无年份按届别周期推：9-12月→2025，1-8月→2026
+  function deadlineParts(rec){
+    const s=String(((rec||{}).timeline||{}).deadline||'');
+    if(!s) return null;
+    let last=null, m; const re=/(?:(\d{4})年)?(\d{1,2})月(\d{1,2})日/g;
+    while((m=re.exec(s))) last=m;
+    if(!last) return null;
+    const mo=+last[2], d=+last[3];
+    return { y: last[1]?+last[1]:(mo>=9?2025:2026), m:mo, d };
+  }
+  function deadlineTs(rec){ const p=deadlineParts(rec); return p ? p.y*10000+p.m*100+p.d : null; }
+  function icsNextDay(dt){ const t=new Date(Date.UTC(+dt.slice(0,4),+dt.slice(4,6)-1,+dt.slice(6,8)+1));
+    return t.getUTCFullYear()+String(t.getUTCMonth()+1).padStart(2,'0')+String(t.getUTCDate()).padStart(2,'0'); }
+  function icsNow(){ const t=new Date();
+    return ''+t.getFullYear()+String(t.getMonth()+1).padStart(2,'0')+String(t.getDate()).padStart(2,'0')+'T'+String(t.getHours()).padStart(2,'0')+String(t.getMinutes()).padStart(2,'0')+'00'; }
+
+  function renderFavList(){
+    const favs=getFavs();
+    document.getElementById('favCount').textContent=favs.length;
+    const box=document.getElementById('favList');
+    if(!favs.length){ box.innerHTML='<div class="empty-tip">暂无收藏批次<br>在结果卡片右下角点 ☆ 收藏</div>'; return; }
+    // 状态以本次匹配结果为准（更准），本次没跑过匹配则退回收藏时的快照
+    const rows=favs.map(f=>{
+      const rec=favRec(f.id);
+      const live=lastResults.find(r=>String(r.id)===String(f.id));
+      return { f, rec, st: live?live.status:(f.status||'no') };
+    });
+    // 按报名截止日期升序（快截止的排前面），无截止日期的排最后
+    rows.sort((a,b)=>{
+      const ka=deadlineTs(a.rec)!=null?deadlineTs(a.rec):99999999;
+      const kb=deadlineTs(b.rec)!=null?deadlineTs(b.rec):99999999;
+      return ka-kb || (pubTs(a.rec)||0)-(pubTs(b.rec)||0);
+    });
+    box.innerHTML=rows.map(({f,rec,st})=>{
+      const cnt=String(((rec||{}).timeline||{}).count||'').trim();
+      const pub=rec?pubTxt(rec):'';          // 公告 2026-01-21
+      const dl=rec?briefDeadline(rec):'';    // 报名截止（原文精简）
+      const exam=rec?briefExamTime(rec):'';  // 笔试/面试时间
+      const timeHtml=(pub||dl||exam)?`<div class="fav-time">`
+        +(dl?`<span class="t-dead">⏰ ${esc(dl)}</span>`:'')
+        +(pub?`<span>📢 ${esc(pub)}</span>`:'')
+        +(exam?`<span>📝 ${esc(exam)}</span>`:'')
+        +`</div>`:'';
+      return `<div class="fav-item" onclick="openDetail('${f.id}')">
+      <span class="fav-status ${st}">${statusText(st)}</span>
+      <div class="fav-info"><div class="fav-title">${esc(f.city)} · ${esc(f.batch)}</div><div class="fav-sub">${esc(f.staffingType||'')}${cnt?(' · 招'+esc(cnt)):''}</div>${timeHtml}</div>
+      <span class="fav-del" onclick="event.stopPropagation();toggleFav('${f.id}')">×</span>
+    </div>`;
+    }).join('');
+  }
+  // 导出日历(.ics)：每个有报名截止日的收藏生成一条全天事件 + 前一天提醒
+  function exportFavICS(){
+    const favs=getFavs();
+    if(!favs.length){ alert('还没有收藏批次'); return; }
+    const evs=[];
+    favs.forEach(f=>{
+      const rec=favRec(f.id); if(!rec) return;
+      const p=deadlineParts(rec); if(!p) return;
+      const dt=''+p.y+String(p.m).padStart(2,'0')+String(p.d).padStart(2,'0');
+      const clean=s=>String(s||'').replace(/[\r\n,;\\]/g,' ').slice(0,180);
+      evs.push(['BEGIN:VEVENT',
+        'UID:'+String(f.id).replace(/[^A-Za-z0-9]/g,'')+'@zj-teacher-match',
+        'DTSTAMP:'+icsNow(),
+        'DTSTART;VALUE=DATE:'+dt,
+        'DTEND;VALUE=DATE:'+icsNextDay(dt),
+        'SUMMARY:'+clean('报名截止·'+rec.city+' '+rec.batch),
+        'DESCRIPTION:'+clean((rec.timeline||{}).deadline),
+        'BEGIN:VALARM','TRIGGER:-PT24H','ACTION:DISPLAY','DESCRIPTION:报名截止前一天','END:VALARM',
+        'END:VEVENT'].join('\r\n'));
+    });
+    if(!evs.length){ alert('收藏的批次在数据库里没有可识别的报名截止日期，无法导出日历'); return; }
+    const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//zj-teacher-match//CN','CALSCALE:GREGORIAN'].concat(evs,['END:VCALENDAR']).join('\r\n');
+    const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='收藏-报名截止提醒.ics';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },300);
+  }
+  function exportFavTxt(){
+    const favs=getFavs();
+    const txt=favs.map(f=>{
+      const rec=favRec(f.id);
+      const live=lastResults.find(r=>String(r.id)===String(f.id));
+      const st=live?live.status:(f.status||'no');
+      const parts=[f.city+' '+f.batch+'（'+statusText(st)+'）'];
+      if(rec){
+        const dl=briefDeadline(rec), exam=briefExamTime(rec), cnt=String((rec.timeline||{}).count||'').trim();
+        if(cnt) parts.push('招'+cnt);
+        if(dl) parts.push('报名：'+dl);
+        if(exam) parts.push('考核：'+exam);
+      }
+      return parts.join('｜');
+    }).join('\n');
+    if(navigator.clipboard) navigator.clipboard.writeText(txt); else alert(txt);
+  }
+  function clearFavorites(){ localStorage.removeItem(FAV_KEY); renderFavList(); renderResults(); }
+
+  // ========== 初始化 ==========
+  function init(){
+    if(typeof TEACHER_DATA!=='undefined'){
+      document.getElementById('statJobs').textContent=TEACHER_DATA.meta.recordCount;
+      document.getElementById('statCities').textContent=11; // 浙江省共11个地级市（舟山批次数据待补充）
+      const cities=[...new Set(TEACHER_DATA.records.map(r=>r.city))].sort((a,b)=>a.localeCompare(b,'zh'));
+      document.getElementById('cityFilter').innerHTML='<option value="">全部城市</option>'+cities.map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
+    document.getElementById('saveBtn').addEventListener('click',()=>{ runMatch(); const ra=document.getElementById('resultArea'); if(ra.scrollIntoView) ra.scrollIntoView({behavior:'smooth',block:'start'}); });
+    document.getElementById('resultArea').innerHTML='<div class="empty-tip">填写左侧档案后，点击「生成我的匹配结果」</div>';
+    buildSchoolOptions();
+    syncSchoolTierHint();
+    syncSchoolType();
+    updateHighlight("schoolType");
+    switchCertStage('小学');
+    syncYouxiuParty();
+  }
+  init();
+  </script>
+</body>
+</html>
